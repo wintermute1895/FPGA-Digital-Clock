@@ -1,107 +1,70 @@
-// DigitalClock.v (Upgraded for Advanced Features)
+// src/DigitalClock.v
+// --- FINAL VERSION ---
 
 module DigitalClock (
-    // -- 物理引脚接口 --
-    input   wire        clk,        // 50MHz 主时钟
-    input   wire        rst,        // 复位
-    
-    // 新增的按键输入
-    input   wire        key_mode,   // 模式切换键
-    input   wire        key_inc,    // 数值增加键
-    
-    // 输出端口不变
+    input   wire        clk,
+    input   wire        rst,
+    input   wire        key_mode,
+    input   wire        key_inc,
+    input   wire        key_alarm_off,
+    output  wire        beep,
     output  wire [6:0]  seg_out,
     output  wire [5:0]  digit_sel
 );
 
-    // -- 内部信号/导线定义 --
-    
-    // 基础功能连线
+    // Internal wires
     wire clk_1hz_wire;
-    wire [4:0] hour_from_counter; // 从计数器输出的小时
-    wire [5:0] min_from_counter;  // 从计数器输出的分钟
-    wire [5:0] sec_from_counter;  // 从计数器输出的秒
+    wire [4:0] hour_from_counter;
+    wire [5:0] min_from_counter;
+    wire [5:0] sec_from_counter;
     wire [3:0] num_to_decode_wire;
+    wire key_mode_pulse, key_inc_pulse, key_alarm_off_pulse;
+    wire time_count_en_wire, load_en_wire;
+    wire [4:0] hour_to_counter;
+    wire [5:0] min_to_counter;
+    wire alarm_on_flag_wire;
+    wire [2:0] display_mode_wire;
 
-    // 按键消抖后产生的脉冲信号
-    wire key_mode_pulse;
-    wire key_inc_pulse;
+    // Instantiate Key Debouncers
+    key_debounce debounce_mode (.clk(clk), .rst(rst), .key_in(key_mode), .key_pulse(key_mode_pulse));
+    key_debounce debounce_inc (.clk(clk), .rst(rst), .key_in(key_inc), .key_pulse(key_inc_pulse));
+    key_debounce debounce_alarm_off (.clk(clk), .rst(rst), .key_in(key_alarm_off), .key_pulse(key_alarm_off_pulse));
 
-    // 控制器 -> 计数器 的控制信号
-    wire time_count_en_wire;
-    wire load_en_wire;
-    wire [4:0] hour_to_counter; // 从控制器传给计数器的新小时值
-    wire [5:0] min_to_counter;  // 从控制器传给计数器的新分钟值
-
-    // -- 模块实例化 --
-
-    // 1. 安装“神经”：按键消抖模块 (需要两个实例)
-    key_debounce debounce_mode (
-        .clk(clk),
-        .rst(rst),
-        .key_in(key_mode),
-        .key_pulse(key_mode_pulse)
-    );
-    key_debounce debounce_inc (
-        .clk(clk),
-        .rst(rst),
-        .key_in(key_inc),
-        .key_pulse(key_inc_pulse)
-    );
-
-    // 2. 安装“大脑皮层”：控制状态机
-    //    (这是我们下一步要编写的新模块)
+    // Instantiate Main Controller
     clock_controller u_controller (
-        .clk(clk),
-        .rst(rst),
-        .key_mode_pulse(key_mode_pulse),
-        .key_inc_pulse(key_inc_pulse),
-        
-        .hour_in(hour_from_counter), // 将当前时间输入给控制器
-        .min_in(min_from_counter),
-        
-        .time_count_en(time_count_en_wire), // 控制器输出的使能信号
-        .load_en(load_en_wire),
-        .hour_out(hour_to_counter),     // 控制器输出的调整后时间
-        .min_out(min_to_counter)
+        .clk(clk), .rst(rst),
+        .key_mode_pulse(key_mode_pulse), .key_inc_pulse(key_inc_pulse), .key_alarm_off_pulse(key_alarm_off_pulse),
+        .hour_in(hour_from_counter), .min_in(min_from_counter), .sec_in(sec_from_counter),
+        .time_count_en(time_count_en_wire), .load_en(load_en_wire),
+        .hour_out(hour_to_counter), .min_out(min_to_counter),
+        .alarm_on_flag(alarm_on_flag_wire),
+        .display_mode(display_mode_wire)
     );
     
-    // 3. 安装“心脏”：时钟分频器 (不变)
-    clk_divider u_clk_divider (
-        .clk_in(clk),
-        .rst(rst),
-        .clk_1hz(clk_1hz_wire)
-    );
+    // Instantiate Buzzer Controller (Note: Not included in this regeneration, assumes exists)
+    // buzzer_controller u_buzzer (.clk(clk), .rst(rst), .alarm_on(alarm_on_flag_wire), .beep(beep));
 
-    // 4. 安装升级后的“大脑”：时间计数器
+    // Instantiate Clock Divider
+    clk_divider u_clk_divider (.clk_in(clk), .rst(rst), .clk_1hz(clk_1hz_wire));
+
+    // Instantiate Time Counter
     time_counter u_time_counter (
-        .clk_1hz(clk_1hz_wire),
-        .rst(rst),
-        .time_count_en(time_count_en_wire), // 接收来自控制器的使能信号
-        .load_en(load_en_wire),
-        .hour_in(hour_to_counter),      // 接收来自控制器的新时间
-        .min_in(min_to_counter),
-        
-        .hour(hour_from_counter),       // 输出当前时间给控制器和显示器
-        .min(min_from_counter),
-        .sec(sec_from_counter)
+        .clk_1hz(clk_1hz_wire), .rst(rst),
+        .time_count_en(time_count_en_wire), .load_en(load_en_wire),
+        .hour_in(hour_to_counter), .min_in(min_to_counter),
+        .hour(hour_from_counter), .min(min_from_counter), .sec(sec_from_counter)
     );
 
-    // 5. 安装“现场总指挥”：动态扫描驱动 (不变)
+    // Instantiate Display Scanner
     display_scanner u_display_scanner (
-        .clk(clk),
-        .rst(rst),
-        .hour(hour_from_counter), // 显示来自计数器的当前时间
-        .min(min_from_counter),
-        .sec(sec_from_counter),
+        .clk(clk), .rst(rst),
+        .hour(hour_from_counter), .min(min_from_counter), .sec(sec_from_counter),
+        .display_mode(display_mode_wire),
         .num_to_decode(num_to_decode_wire),
         .digit_sel(digit_sel)
     );
 
-    // 6. 安装“翻译官”：七段译码器 (不变)
-    display_decoder u_display_decoder (
-        .num_in(num_to_decode_wire),
-        .seg_out(seg_out)
-    );
+    // Instantiate Display Decoder
+    display_decoder u_display_decoder (.num_in(num_to_decode_wire), .seg_out(seg_out));
 
 endmodule
