@@ -1,0 +1,5 @@
+This is a Windows x64 build of tls1.6 statically linked to openssl 0.9.8g
+and linked with the tcl8.4.15 stubs table.  It was built for Windows on AMD64
+using the MSVC 8 compiler.
+
+Patrick Thoyts

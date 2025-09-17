@@ -1,0 +1,52 @@
+ACEX1K ../common/devinfo/legacy ddb_acex1k.pll
+APEX20K ../common/devinfo/legacy ddb_apex20k.pll
+APEX20KC ../common/devinfo/legacy ddb_apex20kc.pll
+APEX20KE ../common/devinfo/legacy ddb_apex20ke.pll
+"APEX II" ../common/devinfo/legacy ddb_apexii.pll
+"Stratix II" ../common/devinfo/stratixii ddb_armstrong.pll
+"Arria II GZ" ../common/devinfo/arriaiigz ddb_arriaiigz.pll
+"Arria V" ../common/devinfo/arriav ddb_arriav.pll
+"Arria V GZ" ../common/devinfo/arriavgz ddb_arriavgz.pll
+"ASC devices" ../common/devinfo/configuration ddb_asc.pll
+"Stratix GX" ../common/devinfo/stratixgx ddb_aurora.pll
+"Cyclone III" ../common/devinfo/cycloneiii ddb_cuda.pll
+"Cyclone II" ../common/devinfo/cycloneii ddb_cycloneii.pll
+"Cyclone IV E" ../common/devinfo/cycloneive ddb_cycloneive.pll
+"Cyclone V" ../common/devinfo/cyclonev ddb_cyclonev.pll
+Mercury ../common/devinfo/legacy ddb_dali.pll
+EMBEDDED_PROCESSOR ../common/devinfo/legacy ddb_embedded_processor.pll
+EPC1 ../common/devinfo/configuration ddb_epc1.pll
+EPC2 ../common/devinfo/configuration ddb_epc2.pll
+EXCALIBUR_ARM ../common/devinfo/legacy ddb_excalibur_arm.pll
+ALTERA ../common/devinfo/legacy ddb_flash_logic.pll
+FLEX10K ../common/devinfo/legacy ddb_flex10k.pll
+FLEX10KA ../common/devinfo/legacy ddb_flex10ka.pll
+FLEX10KB ../common/devinfo/legacy ddb_flex10kb.pll
+FLEX10KE ../common/devinfo/legacy ddb_flex10ke.pll
+FLEX6000 ../common/devinfo/legacy ddb_flex6k.pll
+FLEX8000 ../common/devinfo/legacy ddb_flex8000.pll
+"HardCopy II" ../common/devinfo/hardcopyii ddb_fusion.pll
+"HardCopy III" ../common/devinfo/hardcopyiii ddb_hcx.pll
+"HardCopy IV" ../common/devinfo/hardcopyiii ddb_hcxiv.pll
+"Flash Memory" ../common/devinfo/configuration ddb_intel_cfi.pll
+MAX3000A ../common/devinfo/max3000a ddb_max3000a.pll
+MAX7000A ../common/devinfo/max7000a ddb_max7000a.pll
+MAX7000AE ../common/devinfo/max7000ae ddb_max7000ae.pll
+MAX7000B ../common/devinfo/max7000b ddb_max7000b.pll
+MAX7000S ../common/devinfo/max7000s ddb_max7000s.pll
+MAX9000 ../common/devinfo/legacy ddb_max9000.pll
+"MAX V" ../common/devinfo/maxv ddb_maxv.pll
+"Arria II GX" ../common/devinfo/arriaii ddb_piranha.pll
+"Soc Series V" ../common/devinfo/configuration ddb_soc_series_v.pll
+"Cyclone IV GX" ../common/devinfo/cycloneivgx ddb_stingray.pll
+"Stratix II GX" ../common/devinfo/stratixiigx ddb_stratixiigx.pll
+"Arria GX" ../common/devinfo/arriagx ddb_stratixiigxlite.pll
+"Stratix V" ../common/devinfo/stratixv ddb_stratixv.pll
+"Cyclone III LS" ../common/devinfo/cycloneiii ddb_tarpon.pll
+"Stratix IV" ../common/devinfo/stratixiv ddb_tgx.pll
+"Stratix III" ../common/devinfo/stratixiii ddb_titan.pll
+Cyclone ../common/devinfo/cyclone ddb_tornado.pll
+"MAX II" ../common/devinfo/maxii ddb_tsunami.pll
+"Enhanced Configuration Devices" ../common/devinfo/configuration ddb_vermeer.pll
+"Virtual JTAG TAP" ../common/devinfo/legacy ddb_virtual_jtag_tap.pll
+Stratix ../common/devinfo/stratix ddb_yeager.pll

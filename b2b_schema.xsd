@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<!-- Blocks collection element -->
+	<xs:element name="blocks">
+		<xs:complexType>
+			<xs:sequence minOccurs="1" maxOccurs="unbounded">
+				<xs:element ref="block" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<!-- Single block -->
+	<xs:element name="block">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="name" minOccurs="1" maxOccurs="1">
+					<xs:complexType>
+						<xs:attribute name="block" type="xs:string" use="required" />
+						<xs:attribute name="family" type="xs:string" use="required" />
+						<xs:attribute name="version" type="xs:string" use="required" />
+					</xs:complexType>
+				</xs:element>
+				<!-- Blocks can have 0 or more child block instances. -->
+				<xs:element name="hiers" minOccurs="0">
+					<xs:complexType>
+						<xs:sequence maxOccurs="unbounded" minOccurs="0">
+							<xs:element ref="hier" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<!-- Blocks can have 0 or more ports. -->
+				<xs:element name="ports" minOccurs="0">
+					<xs:complexType>
+						<xs:sequence maxOccurs="unbounded" minOccurs="0">
+							<xs:element ref="port" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<!-- Blocks can have 0 or more params. -->
+				<xs:element name="params" minOccurs="0">
+					<xs:complexType>
+						<xs:sequence maxOccurs="unbounded" minOccurs="0">
+							<xs:element ref="param" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<!-- Child block instance -->
+	<xs:element name="hier">
+		<xs:complexType>
+			<xs:attribute name="instance" type="xs:string" use="required" />
+			<xs:attribute name="block" type="xs:string" use="required" />
+			<xs:attribute name="schematic" type="xs:string" use="required" />
+		</xs:complexType>
+	</xs:element>
+	<!-- Port -->
+	<xs:element name="port">
+		<xs:complexType>
+			<xs:attribute name="name" type="xs:string" use="required" />
+			<xs:attribute name="direction" use="required">
+				<xs:simpleType>
+					<xs:restriction base = "xs:string">
+						<xs:enumeration value = "input"/>
+						<xs:enumeration value = "output"/>
+						<xs:enumeration value = "bidir"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+			<xs:attribute name="width" use="required">
+				<xs:simpleType>
+					<xs:restriction base = "xs:integer">
+						<xs:minInclusive value="0"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<!-- Parameter -->
+	<xs:element name="paramType" abstract="true"/>
+	<xs:element name="settings" substitutionGroup="paramType">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="elem" minOccurs="1" maxOccurs="unbounded">
+					<xs:complexType>
+						<xs:attribute name="name" type="xs:string" use="required"/>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="param">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="paramType" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="name" type="xs:string" use="required" />
+			<xs:attribute name="type" use="required">
+				<xs:simpleType>
+					<xs:restriction base = "xs:string">
+						<xs:enumeration value = "enum"/>
+						<xs:enumeration value = "bitvec"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

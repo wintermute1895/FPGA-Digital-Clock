@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:simpleType name="paramNameType">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="([a-zA-Z0-9_])+"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="paramAccessorType">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="([a-zA-Z0-9_:])+"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<!-- Atoms collection element -->
+	<xs:element name="atoms">
+		<xs:complexType>
+			<xs:sequence minOccurs="1" maxOccurs="unbounded">
+				<xs:element ref="atom" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<!-- Single atom -->
+	<xs:element name="atom">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="name" type="xs:string" minOccurs="1" maxOccurs="1" />
+				<xs:element name="view" minOccurs="1" maxOccurs="1">
+					<xs:simpleType>
+						<xs:restriction base = "xs:string">
+							<xs:enumeration value = "bcm"/>
+							<xs:enumeration value = "logical"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<!-- Atoms can have 0 or more child atom instances. -->
+				<xs:element name="subinsts" minOccurs="0">
+					<xs:complexType>
+						<xs:sequence maxOccurs="unbounded" minOccurs="0">
+							<xs:element ref="subinst" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<!-- Atoms must have at least 1 input port, even if it's fake. -->
+				<xs:element name="iports" minOccurs="1" maxOccurs="1">
+					<xs:complexType>
+						<xs:sequence minOccurs="1" maxOccurs="unbounded">
+							<xs:element ref="iport" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<!-- Atoms must have at least 1 output port, even if it's fake. -->
+				<xs:element name="oports" minOccurs="1" maxOccurs="1">
+					<xs:complexType>
+						<xs:sequence minOccurs="1" maxOccurs="unbounded">
+							<xs:element ref="oport" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<!-- Make parameters optional for the moment, until all files are converted. -->
+				<xs:element name="params" minOccurs="0" maxOccurs="1">
+					<xs:complexType>
+						<xs:sequence minOccurs="0" maxOccurs="unbounded">
+								<xs:element ref="param" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element> 
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+
+	<xs:element name="paramType" abstract="true"/>
+
+	<xs:element name="bitvec" substitutionGroup="paramType">
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:pattern value="([01])+"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:element>
+	
+	<xs:element name="enum" substitutionGroup="paramType" type="xs:string"/>
+
+	<xs:element name="enum_map" substitutionGroup="paramType">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="element" minOccurs="1" maxOccurs="unbounded">
+					<xs:complexType>
+						<xs:all>
+							<xs:element name="int" type="xs:integer" minOccurs="0" maxOccurs="1"/>
+						</xs:all>
+						<xs:attribute name="name" type="xs:string" use="required"/>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="bool" substitutionGroup="paramType" type="xs:boolean"/>
+	<xs:element name="uint" substitutionGroup="paramType" type="xs:unsignedInt"/>
+
+	<xs:element name="param">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="paramType" minOccurs="1" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="accessor" type="paramAccessorType" use="required" />
+			<xs:attribute name="name" type="paramNameType" use="required"/>
+		</xs:complexType>
+	</xs:element>
+
+	<!-- Base type for all ports -->
+	<xs:complexType name="portType">
+		<xs:attribute name="name" type="xs:string" use="required" />
+		<!-- Minimum width is 1 -->
+		<xs:attribute name="width" use="required">
+			<xs:simpleType>
+				<xs:restriction base = "xs:integer">
+					<xs:minInclusive value="1"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="is_bidir" type="xs:boolean" use="required" />
+	</xs:complexType>
+	<!-- Abstract port type -->
+	<xs:element name="port" type="portType" abstract="true" />
+	<!-- Child atom instance -->
+	<xs:element name="subinst">
+		<xs:complexType>
+			<xs:attribute name="name" type="xs:string" use="required" />
+			<xs:attribute name="atom_type_name" type="xs:string" use="required" />
+		</xs:complexType>
+	</xs:element>
+	<!-- Input Port -->
+	<xs:element name="iport" substitutionGroup="port">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="portType">
+					<!-- Elements can appear in any order -->
+					<xs:all>
+						<xs:element name="default_value" minOccurs="1" maxOccurs="1">
+							<xs:simpleType>
+								<xs:restriction base = "xs:string">
+									<xs:enumeration value = "gnd"/>
+									<xs:enumeration value = "vcc"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="active_level" minOccurs="1" maxOccurs="1">
+							<xs:simpleType>
+								<xs:restriction base = "xs:string">
+									<xs:enumeration value = "high"/>
+									<xs:enumeration value = "low"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="tie_off" minOccurs="1" maxOccurs="1">
+							<xs:simpleType>
+								<xs:restriction base = "xs:string">
+									<xs:enumeration value = "none"/>
+									<xs:enumeration value = "vcc"/>
+									<xs:enumeration value = "gnd"/>
+									<xs:enumeration value = "vcc_or_gnd"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="prog_inv" type="xs:boolean" minOccurs="1" maxOccurs="1"/>
+						<xs:element name="float_level" minOccurs="1" maxOccurs="1">
+							<xs:simpleType>
+								<xs:restriction base = "xs:string">
+									<xs:enumeration value = "high"/>
+									<xs:enumeration value = "low"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="float_prog_inv" type="xs:boolean" minOccurs="1" maxOccurs="1"/>
+					</xs:all>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<!-- Output Port -->
+	<xs:element name="oport" substitutionGroup="port" />
+</xs:schema>

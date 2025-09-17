@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:element name="connections">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="connection" minOccurs="1" maxOccurs="unbounded">
+					<xs:complexType>
+						<xs:all>
+							<xs:element name="connection_data" minOccurs="1" maxOccurs="1">
+								<xs:complexType>
+									<xs:all>
+										<xs:element name="hardware_name" type="xs:string" minOccurs="1" maxOccurs="1"/>
+										<xs:element name="device_name" type="xs:string" minOccurs="1" maxOccurs="1"/>
+										<xs:element name="connection_path" type="xs:string" minOccurs="1" maxOccurs="1"/>
+										<xs:element name="connection_path_base" type="xs:string" minOccurs="1" maxOccurs="1"/>
+										<xs:element name="hierarchy_path" type="xs:string" minOccurs="1" maxOccurs="1"/>
+										<xs:element name="connection_type" type="xs:string" minOccurs="1" maxOccurs="1"/>
+										<xs:element name="sld_type" type="xs:string" minOccurs="1" maxOccurs="1"/>
+									</xs:all>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="emulation_data" minOccurs="0" maxOccurs="1">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="emu_data" minOccurs="0" maxOccurs="unbounded">
+											<xs:complexType mixed="true">
+												<xs:attribute name="address" type="xs:string" use="required"/>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+						</xs:all>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified"> 
+	<xs:simpleType name="cppIdentifier">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="([a-zA-Z0-9_])+"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="cppScopedIdentifier">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="([a-zA-Z0-9_:])+"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="userStringType">
+		<xs:restriction base="xs:string"/>
+	</xs:simpleType>
+
+	<xs:element name="types">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="type" maxOccurs="unbounded" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<!-- Dynamic Enum Type -->
+	<xs:element name="type">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="element" minOccurs="1" maxOccurs="unbounded" />
+				<xs:element ref="alias" minOccurs="0" maxOccurs="unbounded" />
+			</xs:sequence>		
+			<xs:attribute name="name" type="cppScopedIdentifier" use="required" />
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="element">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="alternateUserString" type="userStringType" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="value" type="xs:integer" use="optional"/>
+			<xs:attribute name="name" type="cppIdentifier" use="required" />
+			<xs:attribute name="userString" type="userStringType" use="optional" /> 
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="alias">
+		<xs:complexType>
+			<xs:attribute name="name" type="cppIdentifier" use="required" />
+			<xs:attribute name="of" type="cppIdentifier" use="required" />
+		</xs:complexType>
+	</xs:element>
+</xs:schema>
+
