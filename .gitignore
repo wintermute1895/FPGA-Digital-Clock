@@ -7,7 +7,6 @@
 db/
 incremental_db/
 output_files/
-simulation/
 greybox_tmp/
 timing/
 
@@ -49,3 +48,5 @@ wave.do
 .vscode/
 *.swp
 *~
+!run_simulation.do
+!wave_format.do
