@@ -45,7 +45,7 @@ vsim -voptargs="+acc" work.final_test_tb
 # --- Step 5: Configure Waveform and Run Simulation ---
 echo "--- Loading custom wave format and running... ---"
 # Load the predefined wave settings using its absolute path.
-do F:/FPGA/quartus/bin64/simulation/modelsim/final_wave_format.do
+do F:/FPGA/quartus/bin64/simulation/modelsim/wave_format.do
 
 # Run the simulation until the $stop command is encountered in the testbench.
 run -all

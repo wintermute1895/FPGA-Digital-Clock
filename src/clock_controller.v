@@ -14,7 +14,7 @@ module clock_controller (
     output  reg         load_en,
     output  reg [4:0]   hour_out,
     output  reg [5:0]   min_out,
-    output  reg         alarm_on_flag,
+    output  wire        alarm_on_flag,
     output  reg [2:0]   display_mode
 );
 

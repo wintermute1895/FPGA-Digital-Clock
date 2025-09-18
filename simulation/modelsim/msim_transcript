@@ -1,0 +1,84 @@
+# Reading F:/FPGA/modelsim_ase/tcl/vsim/pref.tcl 
+# do DigitalClock_run_msim_rtl_verilog.do 
+# if {[file exists rtl_work]} {
+# 	vdel -lib rtl_work -all
+# }
+# vlib rtl_work
+# vmap work rtl_work
+# Copying F:\FPGA\modelsim_ase\win32aloem/../modelsim.ini to modelsim.ini
+# Modifying modelsim.ini
+# ** Warning: Copied F:\FPGA\modelsim_ase\win32aloem/../modelsim.ini to modelsim.ini.
+#          Updated modelsim.ini.
+# 
+# vlog -vlog01compat -work work +incdir+F:/FPGA/quartus/bin64/src {F:/FPGA/quartus/bin64/src/key_debounce.v}
+# Model Technology ModelSim ALTERA vlog 10.1d Compiler 2012.11 Nov  2 2012
+# -- Compiling module key_debounce
+# 
+# Top level modules:
+# 	key_debounce
+# vlog -vlog01compat -work work +incdir+F:/FPGA/quartus/bin64/src {F:/FPGA/quartus/bin64/src/clock_controller.v}
+# Model Technology ModelSim ALTERA vlog 10.1d Compiler 2012.11 Nov  2 2012
+# -- Compiling module clock_controller
+# 
+# Top level modules:
+# 	clock_controller
+# vlog -vlog01compat -work work +incdir+F:/FPGA/quartus/bin64/src {F:/FPGA/quartus/bin64/src/time_counter.v}
+# Model Technology ModelSim ALTERA vlog 10.1d Compiler 2012.11 Nov  2 2012
+# -- Compiling module time_counter
+# 
+# Top level modules:
+# 	time_counter
+# vlog -vlog01compat -work work +incdir+F:/FPGA/quartus/bin64/src {F:/FPGA/quartus/bin64/src/display_scanner.v}
+# Model Technology ModelSim ALTERA vlog 10.1d Compiler 2012.11 Nov  2 2012
+# -- Compiling module display_scanner
+# 
+# Top level modules:
+# 	display_scanner
+# vlog -vlog01compat -work work +incdir+F:/FPGA/quartus/bin64/src {F:/FPGA/quartus/bin64/src/display_decoder.v}
+# Model Technology ModelSim ALTERA vlog 10.1d Compiler 2012.11 Nov  2 2012
+# -- Compiling module display_decoder
+# 
+# Top level modules:
+# 	display_decoder
+# vlog -vlog01compat -work work +incdir+F:/FPGA/quartus/bin64/src {F:/FPGA/quartus/bin64/src/DigitalClock.v}
+# Model Technology ModelSim ALTERA vlog 10.1d Compiler 2012.11 Nov  2 2012
+# -- Compiling module DigitalClock
+# 
+# Top level modules:
+# 	DigitalClock
+# vlog -vlog01compat -work work +incdir+F:/FPGA/quartus/bin64/src {F:/FPGA/quartus/bin64/src/clk_divider.v}
+# Model Technology ModelSim ALTERA vlog 10.1d Compiler 2012.11 Nov  2 2012
+# -- Compiling module clk_divider
+# 
+# Top level modules:
+# 	clk_divider
+# 
+# vlog -vlog01compat -work work +incdir+F:/FPGA/quartus/bin64/testbench {F:/FPGA/quartus/bin64/testbench/DigitalClock_tb_visual.v}
+# Model Technology ModelSim ALTERA vlog 10.1d Compiler 2012.11 Nov  2 2012
+# -- Compiling module DigitalClock_tb_visual
+# 
+# Top level modules:
+# 	DigitalClock_tb_visual
+# 
+# vsim -t 1ps -L altera_ver -L lpm_ver -L sgate_ver -L altera_mf_ver -L altera_lnsim_ver -L cycloneiii_ver -L rtl_work -L work -voptargs="+acc"  DigitalClock_tb_visual
+# vsim -L altera_ver -L lpm_ver -L sgate_ver -L altera_mf_ver -L altera_lnsim_ver -L cycloneiii_ver -L rtl_work -L work -voptargs=\"+acc\" -t 1ps DigitalClock_tb_visual 
+# Loading work.DigitalClock_tb_visual
+# Loading work.DigitalClock
+# Loading work.key_debounce
+# Loading work.clock_controller
+# Loading work.clk_divider
+# Loading work.time_counter
+# Loading work.display_scanner
+# Loading work.display_decoder
+# 
+# add wave *
+# view structure
+# .main_pane.structure.interior.cs.body.struct
+# view signals
+# .main_pane.objects.interior.cs.body.tree
+# run -all
+# Simulation starting...
+# Simulation of 65us finished. Closing file.
+# Break in Module DigitalClock_tb_visual at F:/FPGA/quartus/bin64/testbench/DigitalClock_tb_visual.v line 62
+# Simulation Breakpoint: Break in Module DigitalClock_tb_visual at F:/FPGA/quartus/bin64/testbench/DigitalClock_tb_visual.v line 62
+# MACRO ./DigitalClock_run_msim_rtl_verilog.do PAUSED at line 23
