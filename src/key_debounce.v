@@ -1,43 +1,65 @@
-// src/key_debounce.v
-// --- FINAL VERSION ---
+// key_debounce.v (FINAL, ABSOLUTELY CORRECTED LOGIC)
 
 module key_debounce (
-    input wire clk,       // 50MHz Main Clock
+    input wire clk,
     input wire rst,
-    input wire key_in,     // Physical key input (active low)
-    output reg key_pulse  // Single-cycle pulse output
+    input wire key_in,
+    output reg key_pulse
 );
-    parameter SIMULATION = 0; // Set to 1 for simulation, 0 for hardware
+    parameter SIMULATION = 1;
 
-    localparam DEBOUNCE_CNT_MAX = (SIMULATION == 1) ? 1_000 : 50_000; // ~20us for sim, ~1ms for hardware
+    localparam DEBOUNCE_CYCLES = (SIMULATION == 1) ? 1000 : 1000000;
+    localparam CNT_WIDTH = $clog2(DEBOUNCE_CYCLES);
 
-    reg [1:0] key_state;
+    reg [1:0] key_state_sync;
+    reg [CNT_WIDTH-1:0] counter;
+    reg key_state_q;
+
+    // Step 1: Synchronize input to clock domain (2-stage synchronizer)
     always @(posedge clk or posedge rst) begin
-        if (rst)    key_state <= 2'b11;
-        else        key_state <= {key_state[0], key_in};
+        if (rst)
+            key_state_sync <= 2'b11;
+        else
+            key_state_sync <= {key_state_sync[0], key_in};
     end
 
-    // Detect falling edge (1 -> 0 transition)
-    wire key_negedge = (key_state == 2'b10);
-    
-    reg [15:0] debounce_counter;
+    // Step 2: Debounce Counter Logic (Corrected)
+    // This logic ensures the counter runs ONLY when the input is stable.
     always @(posedge clk or posedge rst) begin
         if (rst) begin
-            debounce_counter <= 16'd0;
-            key_pulse <= 1'b0;
+            counter <= 0;
+            key_state_q <= 1'b1;
         end else begin
-            key_pulse <= 1'b0; // Pulse is high for one cycle only
-            
-            if (key_negedge) begin
-                debounce_counter <= 16'd0; // Reset counter on new key press
-            end else if (debounce_counter == DEBOUNCE_CNT_MAX - 1) begin
-                key_pulse <= 1'b1; // If time is up, generate pulse
-                debounce_counter <= debounce_counter; // Stop counting
-            end else if (key_state == 2'b00) begin // If key is held down
-                debounce_counter <= debounce_counter + 1;
-            end else begin // If key is released
-                debounce_counter <= 16'd0;
+            if (key_state_sync[1] == key_state_q) begin
+                // If input is stable, reset the counter
+                counter <= 0;
+            end else begin
+                // If input has changed, start counting
+                if (counter < DEBOUNCE_CYCLES - 1) begin
+                    counter <= counter + 1;
+                end else begin
+                    // If counter is full, the new state is stable
+                    key_state_q <= key_state_sync[1];
+                end
             end
         end
     end
+
+    // Step 3: Edge detection to generate the pulse
+    reg key_state_q_prev;
+    always @(posedge clk or posedge rst) begin
+        if (rst) begin
+            key_state_q_prev <= 1'b1;
+            key_pulse <= 1'b0;
+        end else begin
+            key_state_q_prev <= key_state_q;
+            
+            // Generate a pulse on the falling edge (1 -> 0) of the FINAL debounced signal
+            if (key_state_q_prev == 1'b1 && key_state_q == 1'b0)
+                key_pulse <= 1'b1;
+            else
+                key_pulse <= 1'b0;
+        end
+    end
+
 endmodule

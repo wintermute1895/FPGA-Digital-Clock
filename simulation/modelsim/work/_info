@@ -3,156 +3,175 @@ K3
 13
 cModel Technology
 Z0 dF:\FPGA\quartus\bin64\simulation\modelsim
-vclk_divider
-Z1 Io0GZenI@<MAgI7J0Y0EIU2
-Z2 VhELHFKnRdjB6S4kjLFQJ=3
+vbuzzer_controller
+Z1 IgXcCJ8Zc7MbXRkEe^WFBk3
+Z2 VNo]9HGJa[@m]YE;WVWP8Z3
 Z3 dF:\FPGA\quartus\bin64\simulation\modelsim
-Z4 w1758105825
-Z5 8F:/FPGA/quartus/bin64/src/clk_divider.v
-Z6 FF:/FPGA/quartus/bin64/src/clk_divider.v
-L0 4
+Z4 w1758206653
+Z5 8F:/FPGA/quartus/bin64/src/buzzer_controller.v
+Z6 FF:/FPGA/quartus/bin64/src/buzzer_controller.v
+L0 5
 Z7 OV;L;10.1d;51
 r1
 31
 Z8 o-work work -O0
-Z9 !s100 ZgV]j0leHV=L;;begY^Wn2
-Z10 !s108 1758118390.963000
-Z11 !s107 F:/FPGA/quartus/bin64/src/clk_divider.v|
-Z12 !s90 -reportprogress|300|-work|work|F:/FPGA/quartus/bin64/src/clk_divider.v|
+Z9 !s100 E6U@UUPDGXB]g;[QkI1MB1
+Z10 !s108 1758265857.446000
+Z11 !s107 F:/FPGA/quartus/bin64/src/buzzer_controller.v|
+Z12 !s90 -reportprogress|300|-work|work|F:/FPGA/quartus/bin64/src/buzzer_controller.v|
 !i10b 1
 !s85 0
 !s101 -O0
-vclock_controller
-Z13 IUZWdE=>J3bb>B[Z^XA^YV1
-Z14 Vm24HDe[DD;d]n[co9c^mD2
+vclk_divider
+Z13 IKT0kULQbiPgPQ>:S171bj2
+Z14 VP_V9L^9cl1Cl[7U^?>6mR1
 R3
-Z15 w1758113814
-Z16 8F:/FPGA/quartus/bin64/src/clock_controller.v
-Z17 FF:/FPGA/quartus/bin64/src/clock_controller.v
-L0 4
-R7
-r1
-31
-R8
-Z18 !s100 96GR2P]efIhK@df[EecBb0
-Z19 !s108 1758118391.579000
-Z20 !s107 F:/FPGA/quartus/bin64/src/clock_controller.v|
-Z21 !s90 -reportprogress|300|-work|work|F:/FPGA/quartus/bin64/src/clock_controller.v|
-!i10b 1
-!s85 0
-!s101 -O0
-vDigitalClock
-Z22 II:DEA2Bf4UX`gU92EzzMI1
-Z23 VF1mY:G:>jzP2Xo7:>9K7]3
-R3
-Z24 w1758105966
-Z25 8F:/FPGA/quartus/bin64/src/DigitalClock.v
-Z26 FF:/FPGA/quartus/bin64/src/DigitalClock.v
-L0 4
-R7
-r1
-31
-R8
-Z27 n@digital@clock
-!i10b 1
-Z28 !s100 Q9Vnc]cZhL@4fCiQUh4lm3
-!s85 0
-Z29 !s108 1758118391.751000
-Z30 !s107 F:/FPGA/quartus/bin64/src/DigitalClock.v|
-Z31 !s90 -reportprogress|300|-work|work|F:/FPGA/quartus/bin64/src/DigitalClock.v|
-!s101 -O0
-vdisplay_decoder
-Z32 IUQKLPR<kGQGS`o?SUTgK82
-Z33 VgE=Nhfgb@EHOL6JK2Ak^R1
-R3
-Z34 w1757938468
-Z35 8F:/FPGA/quartus/bin64/src/display_decoder.v
-Z36 FF:/FPGA/quartus/bin64/src/display_decoder.v
+Z15 w1758206113
+Z16 8F:/FPGA/quartus/bin64/src/clk_divider.v
+Z17 FF:/FPGA/quartus/bin64/src/clk_divider.v
 L0 5
 R7
 r1
 31
 R8
-Z37 !s100 T3k]Ya1Te_B5TKYY:J@Yf2
-Z38 !s108 1758118391.088000
-Z39 !s107 F:/FPGA/quartus/bin64/src/display_decoder.v|
-Z40 !s90 -reportprogress|300|-work|work|F:/FPGA/quartus/bin64/src/display_decoder.v|
+Z18 !s100 9=0YDYB`JCWNWoe1>^bSh0
+Z19 !s108 1758265856.552000
+Z20 !s107 F:/FPGA/quartus/bin64/src/clk_divider.v|
+Z21 !s90 -reportprogress|300|-work|work|F:/FPGA/quartus/bin64/src/clk_divider.v|
+!i10b 1
+!s85 0
+!s101 -O0
+vclock_controller
+Z22 IM8UDfZ40zXlK3_kLQZn<J0
+Z23 Vm24HDe[DD;d]n[co9c^mD2
+R3
+Z24 w1758265833
+Z25 8F:/FPGA/quartus/bin64/src/clock_controller.v
+Z26 FF:/FPGA/quartus/bin64/src/clock_controller.v
+L0 5
+R7
+r1
+31
+R8
+Z27 !s100 mICRegVKJgmB9GeSJA8_:2
+Z28 !s108 1758265857.554000
+Z29 !s107 F:/FPGA/quartus/bin64/src/clock_controller.v|
+Z30 !s90 -reportprogress|300|-work|work|F:/FPGA/quartus/bin64/src/clock_controller.v|
+!i10b 1
+!s85 0
+!s101 -O0
+vDigitalClock
+Z31 I5[M^]<W6QJe]N^_V58G^H3
+Z32 VF1mY:G:>jzP2Xo7:>9K7]3
+R3
+Z33 w1758206153
+Z34 8F:/FPGA/quartus/bin64/src/DigitalClock.v
+Z35 FF:/FPGA/quartus/bin64/src/DigitalClock.v
+L0 5
+R7
+r1
+31
+R8
+Z36 n@digital@clock
+!i10b 1
+Z37 !s100 @U_meWEHm@:;CiYa2XbCH1
+!s85 0
+Z38 !s108 1758265857.650000
+Z39 !s107 F:/FPGA/quartus/bin64/src/DigitalClock.v|
+Z40 !s90 -reportprogress|300|-work|work|F:/FPGA/quartus/bin64/src/DigitalClock.v|
+!s101 -O0
+vdisplay_decoder
+Z41 IUQKLPR<kGQGS`o?SUTgK82
+Z42 VgE=Nhfgb@EHOL6JK2Ak^R1
+R3
+Z43 w1757938468
+Z44 8F:/FPGA/quartus/bin64/src/display_decoder.v
+Z45 FF:/FPGA/quartus/bin64/src/display_decoder.v
+L0 5
+R7
+r1
+31
+R8
+Z46 !s100 T3k]Ya1Te_B5TKYY:J@Yf2
+Z47 !s108 1758265856.703000
+Z48 !s107 F:/FPGA/quartus/bin64/src/display_decoder.v|
+Z49 !s90 -reportprogress|300|-work|work|F:/FPGA/quartus/bin64/src/display_decoder.v|
 !i10b 1
 !s85 0
 !s101 -O0
 vdisplay_scanner
-Z41 I:gS`>PdD@0`oGzj6Cf9m21
-Z42 V4k^c<g8k>XAzLAOJiKISj2
+Z50 I:gS`>PdD@0`oGzj6Cf9m21
+Z51 V4k^c<g8k>XAzLAOJiKISj2
 R3
-Z43 w1758105937
-Z44 8F:/FPGA/quartus/bin64/src/display_scanner.v
-Z45 FF:/FPGA/quartus/bin64/src/display_scanner.v
+Z52 w1758105937
+Z53 8F:/FPGA/quartus/bin64/src/display_scanner.v
+Z54 FF:/FPGA/quartus/bin64/src/display_scanner.v
 L0 4
 R7
 r1
 31
 R8
-Z46 !s100 4meAP35UbCJI3?maDliL_0
-Z47 !s108 1758118391.437000
-Z48 !s107 F:/FPGA/quartus/bin64/src/display_scanner.v|
-Z49 !s90 -reportprogress|300|-work|work|F:/FPGA/quartus/bin64/src/display_scanner.v|
+Z55 !s100 4meAP35UbCJI3?maDliL_0
+Z56 !s108 1758265857.136000
+Z57 !s107 F:/FPGA/quartus/bin64/src/display_scanner.v|
+Z58 !s90 -reportprogress|300|-work|work|F:/FPGA/quartus/bin64/src/display_scanner.v|
 !i10b 1
 !s85 0
 !s101 -O0
-vfinal_test_tb
+vfull_functionality_tb
 !i10b 1
-!s100 WGa9@c`G4m`9iOJOZSHho0
-IjR`hNn^]JjLPVbS3fMJ>a0
-VHaCKCmCoS`6JSL:]bLYjG3
+!s100 1bnY3hbnZLgj>dejblIz;0
+IR>JN44IGhzaJ]8RJW:A[e1
+V80WofhOYNFYE8R4SL<?k>3
 R3
-w1758118244
-8F:/FPGA/quartus/bin64/testbench/final_test_tb.v
-FF:/FPGA/quartus/bin64/testbench/final_test_tb.v
+w1758263390
+8F:/FPGA/quartus/bin64/testbench/full_functionality_tb.v
+FF:/FPGA/quartus/bin64/testbench/full_functionality_tb.v
 L0 6
 R7
 r1
 !s85 0
 31
-!s108 1758118391.869000
-!s107 F:/FPGA/quartus/bin64/testbench/final_test_tb.v|
-!s90 -reportprogress|300|-work|work|F:/FPGA/quartus/bin64/testbench/final_test_tb.v|
+!s108 1758265857.911000
+!s107 F:/FPGA/quartus/bin64/testbench/full_functionality_tb.v|
+!s90 -reportprogress|300|-work|work|F:/FPGA/quartus/bin64/testbench/full_functionality_tb.v|
 !s101 -O0
 R8
 vkey_debounce
-Z50 I>zTB2R4g0cfme@F:i]OWU1
-Z51 V_D;;2AC]22elU:eId>LFJ0
+Z59 Ic:djkK4?SP863EF_MdQCe2
+Z60 Vl[IoK5g?7bSacg;h5=6e[3
 R3
-Z52 w1758105843
-Z53 8F:/FPGA/quartus/bin64/src/key_debounce.v
-Z54 FF:/FPGA/quartus/bin64/src/key_debounce.v
-L0 4
+Z61 w1758204764
+Z62 8F:/FPGA/quartus/bin64/src/key_debounce.v
+Z63 FF:/FPGA/quartus/bin64/src/key_debounce.v
+L0 3
 R7
 r1
 31
 R8
-Z55 !s100 =W27G@@cF;o_nEVD:;I>P3
-Z56 !s108 1758118391.213000
-Z57 !s107 F:/FPGA/quartus/bin64/src/key_debounce.v|
-Z58 !s90 -reportprogress|300|-work|work|F:/FPGA/quartus/bin64/src/key_debounce.v|
+Z64 !s100 D>H@=K]4dJDz6gTIDL3GL1
+Z65 !s108 1758265856.837000
+Z66 !s107 F:/FPGA/quartus/bin64/src/key_debounce.v|
+Z67 !s90 -reportprogress|300|-work|work|F:/FPGA/quartus/bin64/src/key_debounce.v|
 !i10b 1
 !s85 0
 !s101 -O0
 vtime_counter
-Z59 IZM]A@l<ClgZNWWCd;Ym850
-Z60 Vg8gdYRd=a5mid9Y`9Cz_k2
+Z68 IB7?RQGL]f[clEP>EM_VBT1
+Z69 VLDfOZ?6Z;_3El=^]m?k3m3
 R3
-Z61 w1758105898
-Z62 8F:/FPGA/quartus/bin64/src/time_counter.v
-Z63 FF:/FPGA/quartus/bin64/src/time_counter.v
-L0 4
+Z70 w1758206125
+Z71 8F:/FPGA/quartus/bin64/src/time_counter.v
+Z72 FF:/FPGA/quartus/bin64/src/time_counter.v
+L0 5
 R7
 r1
 31
 R8
-Z64 !s100 z8FXN9Oid795j7TZYb^^C0
-Z65 !s108 1758118391.331000
-Z66 !s107 F:/FPGA/quartus/bin64/src/time_counter.v|
-Z67 !s90 -reportprogress|300|-work|work|F:/FPGA/quartus/bin64/src/time_counter.v|
+Z73 !s100 SIjU@MC9KMZHEEZS@;EBO3
+Z74 !s108 1758265856.984000
+Z75 !s107 F:/FPGA/quartus/bin64/src/time_counter.v|
+Z76 !s90 -reportprogress|300|-work|work|F:/FPGA/quartus/bin64/src/time_counter.v|
 !i10b 1
 !s85 0
 !s101 -O0

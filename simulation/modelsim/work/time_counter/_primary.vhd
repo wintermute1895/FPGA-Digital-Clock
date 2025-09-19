@@ -2,7 +2,8 @@ library verilog;
 use verilog.vl_types.all;
 entity time_counter is
     port(
-        clk_1hz         : in     vl_logic;
+        clk             : in     vl_logic;
+        clk_1hz_en      : in     vl_logic;
         rst             : in     vl_logic;
         time_count_en   : in     vl_logic;
         load_en         : in     vl_logic;

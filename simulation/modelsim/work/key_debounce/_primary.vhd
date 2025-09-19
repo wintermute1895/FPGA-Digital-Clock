@@ -2,7 +2,7 @@ library verilog;
 use verilog.vl_types.all;
 entity key_debounce is
     generic(
-        SIMULATION      : integer := 0
+        SIMULATION      : integer := 1
     );
     port(
         clk             : in     vl_logic;

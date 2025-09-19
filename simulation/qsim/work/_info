@@ -4,10 +4,10 @@ K3
 cModel Technology
 Z0 dF:\FPGA\quartus\bin64\simulation\qsim
 vDigitalClock
-Z1 IiAWUjDoiLF95j@Wk0?ihg2
-Z2 VWY`iHOM^VOQoMhNR5ZSIU3
+Z1 IU>acMaVS:loknCEHzLP3`3
+Z2 VF1mY:G:>jzP2Xo7:>9K7]3
 Z3 dF:\FPGA\quartus\bin64\simulation\qsim
-Z4 w1758037965
+Z4 w1758208363
 Z5 8DigitalClock.vo
 Z6 FDigitalClock.vo
 L0 31
@@ -18,68 +18,68 @@ Z8 !s90 -work|work|DigitalClock.vo|
 Z9 o-work work -O0
 Z10 n@digital@clock
 !i10b 1
-Z11 !s100 j?mzOQm[^4d5LGKkHnglF0
+Z11 !s100 z3e@[KET8H`K?=LGjke9>0
 !s85 0
-Z12 !s108 1758037966.830000
+Z12 !s108 1758208363.807000
 Z13 !s107 DigitalClock.vo|
 !s101 -O0
 vDigitalClock_vlg_check_tst
 !i10b 1
-Z14 !s100 <WaJm4Z7<RO7@LneVdMU=2
-Z15 IEd6bLIUigJDGF?2RC0b4z1
-Z16 Vl>h@BDXRoFFCeQD=Q0IC70
+!s100 GP`NXEZ17o600][RIMBXH3
+IV4_QlYH[E`UFh8o;4KSD91
+VDDPcVBSCc]cLXZcFLjAj>1
 R3
-R4
-Z17 8DigitalClock.vt
-Z18 FDigitalClock.vt
-L0 63
+Z14 w1758208362
+Z15 8DigitalClock.vt
+Z16 FDigitalClock.vt
+L0 65
 R7
 r1
 !s85 0
 31
-Z19 !s108 1758037967.029000
-Z20 !s107 DigitalClock.vt|
-Z21 !s90 -work|work|DigitalClock.vt|
+Z17 !s108 1758208363.950000
+Z18 !s107 DigitalClock.vt|
+Z19 !s90 -work|work|DigitalClock.vt|
 !s101 -O0
 R9
-Z22 n@digital@clock_vlg_check_tst
+Z20 n@digital@clock_vlg_check_tst
 vDigitalClock_vlg_sample_tst
 !i10b 1
-Z23 !s100 i0S>3VgF;hB6zdT=2[DiE3
-Z24 I9JiIgf^DIzL0ljVdX0@<J0
-Z25 Vl;fnV0TB;<?6VMh2W1Pd[1
+!s100 DgE<bcM^Xfmc4AOMGDlU71
+IKB>KDL8GbYa@L;G=O<POH0
+VHIboWo@7B?IBZzWTCkXAS2
 R3
-R4
-R17
-R18
+R14
+R15
+R16
 L0 29
 R7
 r1
 !s85 0
 31
-R19
-R20
-R21
-!s101 -O0
-R9
-Z26 n@digital@clock_vlg_sample_tst
-vDigitalClock_vlg_vec_tst
-!i10b 1
-Z27 !s100 E=LWLfZ1C3UJ=j5h4b:dI3
-Z28 I3gW_K9^LZjakVQ97@2EBl2
-Z29 V>obal[C]1fl<b`PfSQb]<3
-R3
-R4
 R17
 R18
-Z30 L0 394
+R19
+!s101 -O0
+R9
+Z21 n@digital@clock_vlg_sample_tst
+vDigitalClock_vlg_vec_tst
+!i10b 1
+!s100 Di66^VNcDFE5XZBDG7ZeV1
+I=?UH?]PVeDa[7<z:@6TS?2
+Z22 V>obal[C]1fl<b`PfSQb]<3
+R3
+R14
+R15
+R16
+L0 410
 R7
 r1
 !s85 0
 31
+R17
+R18
 R19
-R20
-R21
 !s101 -O0
 R9
-Z31 n@digital@clock_vlg_vec_tst
+Z23 n@digital@clock_vlg_vec_tst

@@ -18,7 +18,7 @@
 // the top level entity of the current Quartus project .The user can use this   
 // testbench to simulate his design using a third-party simulation tool .       
 // *****************************************************************************
-// Generated on "09/16/2025 23:52:45"
+// Generated on "09/18/2025 23:12:41"
                                                                         
 // Verilog Self-Checking Test Bench (with test vectors) for design :    DigitalClock
 // 
@@ -28,12 +28,14 @@
 `timescale 1 ps/ 1 ps
 module DigitalClock_vlg_sample_tst(
 	clk,
+	key_alarm_off,
 	key_inc,
 	key_mode,
 	rst,
 	sampler_tx
 );
 input  clk;
+input  key_alarm_off;
 input  key_inc;
 input  key_mode;
 input  rst;
@@ -41,7 +43,7 @@ output sampler_tx;
 
 reg sample;
 time current_time;
-always @(clk or key_inc or key_mode or rst)
+always @(clk or key_alarm_off or key_inc or key_mode or rst)
                                                                                 
 begin                                                 
  if ($realtime > 0)                                   
@@ -61,23 +63,29 @@ assign sampler_tx = sample;
 endmodule
 
 module DigitalClock_vlg_check_tst (
+	beep,
 	digit_sel,
 	seg_out,
 	sampler_rx
 );
+input  beep;
 input [5:0] digit_sel;
 input [6:0] seg_out;
 input sampler_rx;
 
+reg  beep_expected;
 reg [5:0] digit_sel_expected;
 reg [6:0] seg_out_expected;
 
+reg  beep_prev;
 reg [5:0] digit_sel_prev;
 reg [6:0] seg_out_prev;
 
+reg  beep_expected_prev;
 reg [5:0] digit_sel_expected_prev;
 reg [6:0] seg_out_expected_prev;
 
+reg  last_beep_exp;
 reg [5:0] last_digit_sel_exp;
 reg [6:0] last_seg_out_exp;
 
@@ -86,7 +94,7 @@ reg trigger;
 integer i;
 integer nummismatches;
 
-reg [1:2] on_first_change ;
+reg [1:3] on_first_change ;
 
 
 initial
@@ -94,13 +102,14 @@ begin
 trigger = 0;
 i = 0;
 nummismatches = 0;
-on_first_change = 2'b1;
+on_first_change = 3'b1;
 end
 
 // update real /o prevs
 
 always @(trigger)
 begin
+	beep_prev = beep;
 	digit_sel_prev = digit_sel;
 	seg_out_prev = seg_out;
 end
@@ -109,91 +118,85 @@ end
 
 always @(trigger)
 begin
+	beep_expected_prev = beep_expected;
 	digit_sel_expected_prev = digit_sel_expected;
 	seg_out_expected_prev = seg_out_expected;
 end
 
 
-// expected seg_out[ 6 ]
+
+// expected beep
 initial
 begin
-	seg_out_expected[6] = 1'bX;
-	seg_out_expected[6] = #999000 1'b0;
-end 
-// expected seg_out[ 5 ]
-initial
-begin
-	seg_out_expected[5] = 1'bX;
-	seg_out_expected[5] = #999000 1'b0;
-end 
-// expected seg_out[ 4 ]
-initial
-begin
-	seg_out_expected[4] = 1'bX;
-	seg_out_expected[4] = #999000 1'b0;
-end 
-// expected seg_out[ 3 ]
-initial
-begin
-	seg_out_expected[3] = 1'bX;
-	seg_out_expected[3] = #999000 1'b0;
-end 
-// expected seg_out[ 2 ]
-initial
-begin
-	seg_out_expected[2] = 1'bX;
-	seg_out_expected[2] = #999000 1'b0;
-end 
-// expected seg_out[ 1 ]
-initial
-begin
-	seg_out_expected[1] = 1'bX;
-	seg_out_expected[1] = #999000 1'b0;
-end 
-// expected seg_out[ 0 ]
-initial
-begin
-	seg_out_expected[0] = 1'bX;
-	seg_out_expected[0] = #999000 1'b0;
+	beep_expected = 1'bX;
 end 
 // expected digit_sel[ 5 ]
 initial
 begin
 	digit_sel_expected[5] = 1'bX;
-	digit_sel_expected[5] = #999000 1'b0;
 end 
 // expected digit_sel[ 4 ]
 initial
 begin
 	digit_sel_expected[4] = 1'bX;
-	digit_sel_expected[4] = #999000 1'b0;
 end 
 // expected digit_sel[ 3 ]
 initial
 begin
 	digit_sel_expected[3] = 1'bX;
-	digit_sel_expected[3] = #999000 1'b0;
 end 
 // expected digit_sel[ 2 ]
 initial
 begin
 	digit_sel_expected[2] = 1'bX;
-	digit_sel_expected[2] = #999000 1'b0;
 end 
 // expected digit_sel[ 1 ]
 initial
 begin
 	digit_sel_expected[1] = 1'bX;
-	digit_sel_expected[1] = #999000 1'b0;
 end 
 // expected digit_sel[ 0 ]
 initial
 begin
 	digit_sel_expected[0] = 1'bX;
-	digit_sel_expected[0] = #999000 1'b0;
+end 
+// expected seg_out[ 6 ]
+initial
+begin
+	seg_out_expected[6] = 1'bX;
+end 
+// expected seg_out[ 5 ]
+initial
+begin
+	seg_out_expected[5] = 1'bX;
+end 
+// expected seg_out[ 4 ]
+initial
+begin
+	seg_out_expected[4] = 1'bX;
+end 
+// expected seg_out[ 3 ]
+initial
+begin
+	seg_out_expected[3] = 1'bX;
+end 
+// expected seg_out[ 2 ]
+initial
+begin
+	seg_out_expected[2] = 1'bX;
+end 
+// expected seg_out[ 1 ]
+initial
+begin
+	seg_out_expected[1] = 1'bX;
+end 
+// expected seg_out[ 0 ]
+initial
+begin
+	seg_out_expected[0] = 1'bX;
 end 
 // generate trigger
-always @(digit_sel_expected or digit_sel or seg_out_expected or seg_out)
+always @(beep_expected or beep or digit_sel_expected or digit_sel or seg_out_expected or seg_out)
 begin
 	trigger <= ~trigger;
 end
@@ -203,176 +206,189 @@ begin
 `ifdef debug_tbench
 	$display("Scanning pattern %d @time = %t",i,$realtime );
 	i = i + 1;
-	$display("| expected digit_sel = %b | expected seg_out = %b | ",digit_sel_expected_prev,seg_out_expected_prev);
-	$display("| real digit_sel = %b | real seg_out = %b | ",digit_sel_prev,seg_out_prev);
+	$display("| expected beep = %b | expected digit_sel = %b | expected seg_out = %b | ",beep_expected_prev,digit_sel_expected_prev,seg_out_expected_prev);
+	$display("| real beep = %b | real digit_sel = %b | real seg_out = %b | ",beep_prev,digit_sel_prev,seg_out_prev);
 `endif
+	if (
+		( beep_expected_prev !== 1'bx ) && ( beep_prev !== beep_expected_prev )
+		&& ((beep_expected_prev !== last_beep_exp) ||
+			on_first_change[1])
+	)
+	begin
+		$display ("ERROR! Vector Mismatch for output port beep :: @time = %t",  $realtime);
+		$display ("     Expected value = %b", beep_expected_prev);
+		$display ("     Real value = %b", beep_prev);
+		nummismatches = nummismatches + 1;
+		on_first_change[1] = 1'b0;
+		last_beep_exp = beep_expected_prev;
+	end
 	if (
 		( digit_sel_expected_prev[0] !== 1'bx ) && ( digit_sel_prev[0] !== digit_sel_expected_prev[0] )
 		&& ((digit_sel_expected_prev[0] !== last_digit_sel_exp[0]) ||
-			on_first_change[1])
+			on_first_change[2])
 	)
 	begin
 		$display ("ERROR! Vector Mismatch for output port digit_sel[0] :: @time = %t",  $realtime);
 		$display ("     Expected value = %b", digit_sel_expected_prev);
 		$display ("     Real value = %b", digit_sel_prev);
 		nummismatches = nummismatches + 1;
-		on_first_change[1] = 1'b0;
+		on_first_change[2] = 1'b0;
 		last_digit_sel_exp[0] = digit_sel_expected_prev[0];
 	end
 	if (
 		( digit_sel_expected_prev[1] !== 1'bx ) && ( digit_sel_prev[1] !== digit_sel_expected_prev[1] )
 		&& ((digit_sel_expected_prev[1] !== last_digit_sel_exp[1]) ||
-			on_first_change[1])
+			on_first_change[2])
 	)
 	begin
 		$display ("ERROR! Vector Mismatch for output port digit_sel[1] :: @time = %t",  $realtime);
 		$display ("     Expected value = %b", digit_sel_expected_prev);
 		$display ("     Real value = %b", digit_sel_prev);
 		nummismatches = nummismatches + 1;
-		on_first_change[1] = 1'b0;
+		on_first_change[2] = 1'b0;
 		last_digit_sel_exp[1] = digit_sel_expected_prev[1];
 	end
 	if (
 		( digit_sel_expected_prev[2] !== 1'bx ) && ( digit_sel_prev[2] !== digit_sel_expected_prev[2] )
 		&& ((digit_sel_expected_prev[2] !== last_digit_sel_exp[2]) ||
-			on_first_change[1])
+			on_first_change[2])
 	)
 	begin
 		$display ("ERROR! Vector Mismatch for output port digit_sel[2] :: @time = %t",  $realtime);
 		$display ("     Expected value = %b", digit_sel_expected_prev);
 		$display ("     Real value = %b", digit_sel_prev);
 		nummismatches = nummismatches + 1;
-		on_first_change[1] = 1'b0;
+		on_first_change[2] = 1'b0;
 		last_digit_sel_exp[2] = digit_sel_expected_prev[2];
 	end
 	if (
 		( digit_sel_expected_prev[3] !== 1'bx ) && ( digit_sel_prev[3] !== digit_sel_expected_prev[3] )
 		&& ((digit_sel_expected_prev[3] !== last_digit_sel_exp[3]) ||
-			on_first_change[1])
+			on_first_change[2])
 	)
 	begin
 		$display ("ERROR! Vector Mismatch for output port digit_sel[3] :: @time = %t",  $realtime);
 		$display ("     Expected value = %b", digit_sel_expected_prev);
 		$display ("     Real value = %b", digit_sel_prev);
 		nummismatches = nummismatches + 1;
-		on_first_change[1] = 1'b0;
+		on_first_change[2] = 1'b0;
 		last_digit_sel_exp[3] = digit_sel_expected_prev[3];
 	end
 	if (
 		( digit_sel_expected_prev[4] !== 1'bx ) && ( digit_sel_prev[4] !== digit_sel_expected_prev[4] )
 		&& ((digit_sel_expected_prev[4] !== last_digit_sel_exp[4]) ||
-			on_first_change[1])
+			on_first_change[2])
 	)
 	begin
 		$display ("ERROR! Vector Mismatch for output port digit_sel[4] :: @time = %t",  $realtime);
 		$display ("     Expected value = %b", digit_sel_expected_prev);
 		$display ("     Real value = %b", digit_sel_prev);
 		nummismatches = nummismatches + 1;
-		on_first_change[1] = 1'b0;
+		on_first_change[2] = 1'b0;
 		last_digit_sel_exp[4] = digit_sel_expected_prev[4];
 	end
 	if (
 		( digit_sel_expected_prev[5] !== 1'bx ) && ( digit_sel_prev[5] !== digit_sel_expected_prev[5] )
 		&& ((digit_sel_expected_prev[5] !== last_digit_sel_exp[5]) ||
-			on_first_change[1])
+			on_first_change[2])
 	)
 	begin
 		$display ("ERROR! Vector Mismatch for output port digit_sel[5] :: @time = %t",  $realtime);
 		$display ("     Expected value = %b", digit_sel_expected_prev);
 		$display ("     Real value = %b", digit_sel_prev);
 		nummismatches = nummismatches + 1;
-		on_first_change[1] = 1'b0;
+		on_first_change[2] = 1'b0;
 		last_digit_sel_exp[5] = digit_sel_expected_prev[5];
 	end
 	if (
 		( seg_out_expected_prev[0] !== 1'bx ) && ( seg_out_prev[0] !== seg_out_expected_prev[0] )
 		&& ((seg_out_expected_prev[0] !== last_seg_out_exp[0]) ||
-			on_first_change[2])
+			on_first_change[3])
 	)
 	begin
 		$display ("ERROR! Vector Mismatch for output port seg_out[0] :: @time = %t",  $realtime);
 		$display ("     Expected value = %b", seg_out_expected_prev);
 		$display ("     Real value = %b", seg_out_prev);
 		nummismatches = nummismatches + 1;
-		on_first_change[2] = 1'b0;
+		on_first_change[3] = 1'b0;
 		last_seg_out_exp[0] = seg_out_expected_prev[0];
 	end
 	if (
 		( seg_out_expected_prev[1] !== 1'bx ) && ( seg_out_prev[1] !== seg_out_expected_prev[1] )
 		&& ((seg_out_expected_prev[1] !== last_seg_out_exp[1]) ||
-			on_first_change[2])
+			on_first_change[3])
 	)
 	begin
 		$display ("ERROR! Vector Mismatch for output port seg_out[1] :: @time = %t",  $realtime);
 		$display ("     Expected value = %b", seg_out_expected_prev);
 		$display ("     Real value = %b", seg_out_prev);
 		nummismatches = nummismatches + 1;
-		on_first_change[2] = 1'b0;
+		on_first_change[3] = 1'b0;
 		last_seg_out_exp[1] = seg_out_expected_prev[1];
 	end
 	if (
 		( seg_out_expected_prev[2] !== 1'bx ) && ( seg_out_prev[2] !== seg_out_expected_prev[2] )
 		&& ((seg_out_expected_prev[2] !== last_seg_out_exp[2]) ||
-			on_first_change[2])
+			on_first_change[3])
 	)
 	begin
 		$display ("ERROR! Vector Mismatch for output port seg_out[2] :: @time = %t",  $realtime);
 		$display ("     Expected value = %b", seg_out_expected_prev);
 		$display ("     Real value = %b", seg_out_prev);
 		nummismatches = nummismatches + 1;
-		on_first_change[2] = 1'b0;
+		on_first_change[3] = 1'b0;
 		last_seg_out_exp[2] = seg_out_expected_prev[2];
 	end
 	if (
 		( seg_out_expected_prev[3] !== 1'bx ) && ( seg_out_prev[3] !== seg_out_expected_prev[3] )
 		&& ((seg_out_expected_prev[3] !== last_seg_out_exp[3]) ||
-			on_first_change[2])
+			on_first_change[3])
 	)
 	begin
 		$display ("ERROR! Vector Mismatch for output port seg_out[3] :: @time = %t",  $realtime);
 		$display ("     Expected value = %b", seg_out_expected_prev);
 		$display ("     Real value = %b", seg_out_prev);
 		nummismatches = nummismatches + 1;
-		on_first_change[2] = 1'b0;
+		on_first_change[3] = 1'b0;
 		last_seg_out_exp[3] = seg_out_expected_prev[3];
 	end
 	if (
 		( seg_out_expected_prev[4] !== 1'bx ) && ( seg_out_prev[4] !== seg_out_expected_prev[4] )
 		&& ((seg_out_expected_prev[4] !== last_seg_out_exp[4]) ||
-			on_first_change[2])
+			on_first_change[3])
 	)
 	begin
 		$display ("ERROR! Vector Mismatch for output port seg_out[4] :: @time = %t",  $realtime);
 		$display ("     Expected value = %b", seg_out_expected_prev);
 		$display ("     Real value = %b", seg_out_prev);
 		nummismatches = nummismatches + 1;
-		on_first_change[2] = 1'b0;
+		on_first_change[3] = 1'b0;
 		last_seg_out_exp[4] = seg_out_expected_prev[4];
 	end
 	if (
 		( seg_out_expected_prev[5] !== 1'bx ) && ( seg_out_prev[5] !== seg_out_expected_prev[5] )
 		&& ((seg_out_expected_prev[5] !== last_seg_out_exp[5]) ||
-			on_first_change[2])
+			on_first_change[3])
 	)
 	begin
 		$display ("ERROR! Vector Mismatch for output port seg_out[5] :: @time = %t",  $realtime);
 		$display ("     Expected value = %b", seg_out_expected_prev);
 		$display ("     Real value = %b", seg_out_prev);
 		nummismatches = nummismatches + 1;
-		on_first_change[2] = 1'b0;
+		on_first_change[3] = 1'b0;
 		last_seg_out_exp[5] = seg_out_expected_prev[5];
 	end
 	if (
 		( seg_out_expected_prev[6] !== 1'bx ) && ( seg_out_prev[6] !== seg_out_expected_prev[6] )
 		&& ((seg_out_expected_prev[6] !== last_seg_out_exp[6]) ||
-			on_first_change[2])
+			on_first_change[3])
 	)
 	begin
 		$display ("ERROR! Vector Mismatch for output port seg_out[6] :: @time = %t",  $realtime);
 		$display ("     Expected value = %b", seg_out_expected_prev);
 		$display ("     Real value = %b", seg_out_prev);
 		nummismatches = nummismatches + 1;
-		on_first_change[2] = 1'b0;
+		on_first_change[3] = 1'b0;
 		last_seg_out_exp[6] = seg_out_expected_prev[6];
 	end
 
@@ -382,7 +398,7 @@ initial
 
 begin 
 $timeformat(-12,3," ps",6);
-#10000000;
+#90000000;
 if (nummismatches > 0)
 	$display ("%d mismatched vectors : Simulation failed !",nummismatches);
 else
@@ -395,10 +411,12 @@ module DigitalClock_vlg_vec_tst();
 // constants                                           
 // general purpose registers
 reg clk;
+reg key_alarm_off;
 reg key_inc;
 reg key_mode;
 reg rst;
 // wires                                               
+wire beep;
 wire [5:0] digit_sel;
 wire [6:0] seg_out;
 
@@ -407,8 +425,10 @@ wire sampler;
 // assign statements (if any)                          
 DigitalClock i1 (
 // port map - connection between master ports and signals/registers   
+	.beep(beep),
 	.clk(clk),
 	.digit_sel(digit_sel),
+	.key_alarm_off(key_alarm_off),
 	.key_inc(key_inc),
 	.key_mode(key_mode),
 	.rst(rst),
@@ -423,28 +443,26 @@ begin
 	#10000;
 end 
 
+// key_alarm_off
+initial
+begin
+	key_alarm_off = 1'b0;
+end 
+
 // key_inc
 initial
 begin
-	key_inc = 1'b1;
-	key_inc = #3040000 1'b0;
-	key_inc = #40000 1'b1;
-	key_inc = #840000 1'b0;
-	key_inc = #40000 1'b1;
-	key_inc = #1960000 1'b0;
-	key_inc = #40000 1'b1;
+	key_inc = 1'b0;
+	key_inc = #2150000 1'b1;
+	key_inc = #280000 1'b0;
 end 
 
 // key_mode
 initial
 begin
-	key_mode = 1'b1;
-	key_mode = #1960000 1'b0;
-	key_mode = #40000 1'b1;
-	key_mode = #2840000 1'b0;
-	key_mode = #40000 1'b1;
-	key_mode = #2200000 1'b0;
-	key_mode = #40000 1'b1;
+	key_mode = 1'b0;
+	key_mode = #1070000 1'b1;
+	key_mode = #270000 1'b0;
 end 
 
 // rst
@@ -456,6 +474,7 @@ end
 
 DigitalClock_vlg_sample_tst tb_sample (
 	.clk(clk),
+	.key_alarm_off(key_alarm_off),
 	.key_inc(key_inc),
 	.key_mode(key_mode),
 	.rst(rst),
@@ -463,6 +482,7 @@ DigitalClock_vlg_sample_tst tb_sample (
 );
 
 DigitalClock_vlg_check_tst tb_out(
+	.beep(beep),
 	.digit_sel(digit_sel),
 	.seg_out(seg_out),
 	.sampler_rx(sampler)
