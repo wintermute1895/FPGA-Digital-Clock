@@ -6,9 +6,9 @@ module key_debounce (
     input wire key_in,
     output reg key_pulse
 );
-    parameter SIMULATION = 1;
+    parameter SIMULATION = 0;
 
-    localparam DEBOUNCE_CYCLES = (SIMULATION == 1) ? 1000 : 1000000;
+    localparam DEBOUNCE_CYCLES = (SIMULATION == 0   ) ? 1000 : 1000000;
     localparam CNT_WIDTH = $clog2(DEBOUNCE_CYCLES);
 
     reg [1:0] key_state_sync;

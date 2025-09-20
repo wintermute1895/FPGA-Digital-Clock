@@ -11,7 +11,7 @@ module display_scanner (
     output  reg  [3:0]  num_to_decode,
     output  reg  [5:0]  digit_sel
 );
-    parameter SIMULATION = 0;
+    parameter SIMULATION = 0; // 仿真设为1, 硬件设为0
     
     // State definitions (must match the controller)
     parameter S_ADJ_H     = 3'd1;

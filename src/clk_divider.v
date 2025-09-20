@@ -8,7 +8,7 @@ module clk_divider (
     output  reg     clk_1hz_en // 输出端口从 clk_1hz 重命名为 clk_1hz_en
 );
     // 使用参数方便在仿真和硬件之间切换
-    parameter SIMULATION = 0; // 仿真设为1, 硬件设为0
+    parameter SIMULATION = 1; // 仿真设为1, 硬件设为0
 
     // 根据模式定义计数器最大值
     localparam CNT_MAX = (SIMULATION == 1) ? 50 : 50_000_000;
