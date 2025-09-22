@@ -37,7 +37,7 @@
 
 
 set_global_assignment -name FAMILY "Cyclone III"
-set_global_assignment -name DEVICE EP3C5E144C8
+set_global_assignment -name DEVICE EP3C10E144C8
 set_global_assignment -name TOP_LEVEL_ENTITY DigitalClock
 set_global_assignment -name ORIGINAL_QUARTUS_VERSION "13.0 SP1"
 set_global_assignment -name PROJECT_CREATION_TIME_DATE "15:38:09  SEPTEMBER 15, 2025"
@@ -45,8 +45,10 @@ set_global_assignment -name LAST_QUARTUS_VERSION "13.0 SP1"
 set_global_assignment -name PROJECT_OUTPUT_DIRECTORY output_files
 set_global_assignment -name MIN_CORE_JUNCTION_TEMP 0
 set_global_assignment -name MAX_CORE_JUNCTION_TEMP 85
+# 例如：在 .qsf 文件中添加这一行
+# set_global_assignment -name FMAX_REQUIREMENT "50 MHz" -section_id Timing
+set_global_assignment -name FMAX_REQUIREMENT "50 MHz"
 set_global_assignment -name ERROR_CHECK_FREQUENCY_DIVISOR 1
-set_global_assignment -name NOMINAL_CORE_SUPPLY_VOLTAGE 1.2V
 set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
 set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
 set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
@@ -64,15 +66,53 @@ set_global_assignment -name EDA_TEST_BENCH_MODULE_NAME DigitalClock_tb_visual -s
 set_global_assignment -name EDA_TEST_BENCH_FILE testbench/DigitalClock_tb_visual.v -section_id DigitalClock_tb_visual
 set_global_assignment -name POWER_PRESET_COOLING_SOLUTION "23 MM HEAT SINK WITH 200 LFPM AIRFLOW"
 set_global_assignment -name POWER_BOARD_THERMAL_MODEL "NONE (CONSERVATIVE)"
+set_global_assignment -name INCREMENTAL_VECTOR_INPUT_SOURCE "F:/FPGA/quartus/bin64/src/Waveform4.vwf"
+set_global_assignment -name STRATIX_DEVICE_IO_STANDARD "2.5 V"
+set_location_assignment PIN_86 -to beep
+set_location_assignment PIN_88 -to clk
+set_location_assignment PIN_4 -to key_alarm_off
+set_location_assignment PIN_7 -to key_inc
+set_location_assignment PIN_10 -to key_mode
+set_location_assignment PIN_11 -to rst
+set_location_assignment PIN_76 -to seg_hour0[3]
+set_location_assignment PIN_75 -to seg_hour0[2]
+set_location_assignment PIN_74 -to seg_hour0[1]
+set_location_assignment PIN_73 -to seg_hour0[0]
+set_location_assignment PIN_83 -to seg_hour1[3]
+set_location_assignment PIN_80 -to seg_hour1[2]
+set_location_assignment PIN_79 -to seg_hour1[1]
+set_location_assignment PIN_77 -to seg_hour1[0]
+set_location_assignment PIN_64 -to seg_min0[3]
+set_location_assignment PIN_60 -to seg_min0[2]
+set_location_assignment PIN_59 -to seg_min0[1]
+set_location_assignment PIN_58 -to seg_min0[0]
+set_location_assignment PIN_68 -to seg_min1[3]
+set_location_assignment PIN_67 -to seg_min1[2]
+set_location_assignment PIN_66 -to seg_min1[1]
+set_location_assignment PIN_65 -to seg_min1[0]
+set_location_assignment PIN_44 -to seg_sec0[3]
+set_location_assignment PIN_43 -to seg_sec0[2]
+set_location_assignment PIN_42 -to seg_sec0[1]
+set_location_assignment PIN_39 -to seg_sec0[0]
+set_location_assignment PIN_50 -to seg_sec1[3]
+set_location_assignment PIN_51 -to seg_sec1[2]
+set_location_assignment PIN_52 -to seg_sec1[1]
+set_location_assignment PIN_53 -to seg_sec1[0]
+set_global_assignment -name VERILOG_FILE ../../clock_project_1v1.1/bcd_adjustable_time_reg.v
+set_global_assignment -name VERILOG_FILE src/display_controller.v
+set_global_assignment -name VERILOG_FILE src/power_on_reset.v
 set_global_assignment -name VERILOG_FILE src/key_debounce.v
 set_global_assignment -name VERILOG_FILE src/clock_controller.v
 set_global_assignment -name VERILOG_FILE src/buzzer_controller.v
 set_global_assignment -name VERILOG_FILE src/time_counter.v
-set_global_assignment -name VERILOG_FILE src/display_scanner.v
-set_global_assignment -name VERILOG_FILE src/display_decoder.v
 set_global_assignment -name VERILOG_FILE src/DigitalClock.v
 set_global_assignment -name VERILOG_FILE src/clk_divider.v
-set_global_assignment -name VECTOR_WAVEFORM_FILE src/Waveform3.vwf
-set_global_assignment -name VECTOR_WAVEFORM_FILE src/Waveform4.vwf
-set_global_assignment -name INCREMENTAL_VECTOR_INPUT_SOURCE "F:/FPGA/quartus/bin64/src/Waveform4.vwf"
+set_global_assignment -name CDF_FILE output_files/Chain3.cdf
+set_global_assignment -name CDF_FILE output_files/Chain2.cdf
+set_global_assignment -name CDF_FILE output_files/Chain4.cdf
+set_global_assignment -name CDF_FILE output_files/Chain5.cdf
+set_global_assignment -name CDF_FILE output_files/Chain7.cdf
+set_global_assignment -name CDF_FILE output_files/Chain8.cdf
+set_global_assignment -name CDF_FILE output_files/Chain9.cdf
+set_global_assignment -name CDF_FILE ../../clock_project_1v1.1/Chain10.cdf
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top

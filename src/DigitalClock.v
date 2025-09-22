@@ -1,77 +1,60 @@
-// src/DigitalClock.v
-// --- FINAL VERSION (Corrected) ---
-// 功能：顶层模块，修正了子模块的连线以适配新的设计
-
+// src/DigitalClock.v (Corrected Top Module Wiring)
 module DigitalClock (
-    input   wire        clk,
-    input   wire        rst,
-    input   wire        key_mode,
-    input   wire        key_inc,
-    input   wire        key_alarm_off,
-    output  wire        beep,
-    output  wire [6:0]  seg_out,
-    output  wire [5:0]  digit_sel
+    input  wire        clk,
+    input  wire        rst_key_in, // 外部复位按键
+    input  wire        key_mode,
+    input  wire        key_inc,
+    input  wire        key_alarm_off,
+    output wire        beep,
+    output wire [3:0]  seg_sec0, seg_sec1,
+    output wire [3:0]  seg_min0, seg_min1,
+    output wire [3:0]  seg_hour0, seg_hour1
 );
-
-    // 内部信号线
-    wire clk_1hz_en_wire; // 【改动】信号重命名，表示它是一个使能信号
-    wire [4:0] hour_from_counter;
-    wire [5:0] min_from_counter;
-    wire [5:0] sec_from_counter;
-    wire [3:0] num_to_decode_wire;
+    wire clk_1hz, clk_100hz, clk_buzzer_osc;
     wire key_mode_pulse, key_inc_pulse, key_alarm_off_pulse;
-    wire time_count_en_wire, load_en_wire;
-    wire [4:0] hour_to_counter;
-    wire [5:0] min_to_counter;
-    wire alarm_on_flag_wire;
-    wire [2:0] display_mode_wire;
+    wire rst_signal = ~rst_key_in;
 
-    // 实例化按键消抖模块
-    key_debounce debounce_mode (.clk(clk), .rst(rst), .key_in(key_mode), .key_pulse(key_mode_pulse));
-    key_debounce debounce_inc (.clk(clk), .rst(rst), .key_in(key_inc), .key_pulse(key_inc_pulse));
-    key_debounce debounce_alarm_off (.clk(clk), .rst(rst), .key_in(key_alarm_off), .key_pulse(key_alarm_off_pulse));
+    clk_divider u_clk_divider (.clk(clk), .rst(rst_signal), .clk_1hz(clk_1hz), .clk_100hz(clk_100hz), .clk_buzzer_osc(clk_buzzer_osc));
+    key_debounce debounce_mode (.clk_100hz(clk_100hz), .rst(rst_signal), .key_in(key_mode), .key_pulse(key_mode_pulse));
+    key_debounce debounce_inc (.clk_100hz(clk_100hz), .rst(rst_signal), .key_in(key_inc), .key_pulse(key_inc_pulse));
+    key_debounce debounce_alarm_off (.clk_100hz(clk_100hz), .rst(rst_signal), .key_in(key_alarm_off), .key_pulse(key_alarm_off_pulse));
 
-    // 实例化主控制器
+    wire [3:0] s_units, s_tens, m_units, m_tens, h_units, h_tens;
+    wire time_count_en, time_load_en;
+    wire [4:0] hour_to_load;
+    wire [5:0] min_to_load;
+    time_counter u_time_counter ( .clk(clk), .clk_1hz(clk_1hz), .rst(rst_signal), .time_count_en(time_count_en), .load_en(time_load_en), .hour_in(hour_to_load), .min_in(min_to_load), .s_units_r(s_units), .s_tens_r(s_tens), .m_units_r(m_units), .m_tens_r(m_tens), .h_units_r(h_units), .h_tens_r(h_tens) );
+
+    wire time_adj_load_en, time_adj_h_sel, time_adj_m_sel, time_adj_inc_pulse;
+    wire alarm_adj_load_en, alarm_adj_h_sel, alarm_adj_m_sel, alarm_adj_inc_pulse;
+    wire [4:0] time_adj_init_h;
+    wire [5:0] time_adj_init_m;
+    wire [3:0] adj_h_units, adj_h_tens, adj_m_units, adj_m_tens;
+    wire [3:0] alarm_h_units, alarm_h_tens, alarm_m_units, alarm_m_tens;
+    bcd_adjustable_time_reg u_time_set_reg ( .clk_100hz(clk_100hz), .rst(rst_signal), .load_en(time_adj_load_en), .init_h_val(time_adj_init_h), .init_m_val(time_adj_init_m), .h_sel(time_adj_h_sel), .m_sel(time_adj_m_sel), .inc_val_pulse(time_adj_inc_pulse), .h_units_r(adj_h_units), .h_tens_r(adj_h_tens), .m_units_r(adj_m_units), .m_tens_r(adj_m_tens) );
+    bcd_adjustable_time_reg u_alarm_set_reg ( .clk_100hz(clk_100hz), .rst(rst_signal), .load_en(alarm_adj_load_en), .init_h_val(5'd6), .init_m_val(6'd0), .h_sel(alarm_adj_h_sel), .m_sel(alarm_adj_m_sel), .inc_val_pulse(alarm_adj_inc_pulse), .h_units_r(alarm_h_units), .h_tens_r(alarm_h_tens), .m_units_r(alarm_m_units), .m_tens_r(alarm_m_tens) );
+
+    wire alarm_on_flag;
     clock_controller u_controller (
-        .clk(clk), .rst(rst),
+        .clk_100hz(clk_100hz), .rst(rst_signal),
         .key_mode_pulse(key_mode_pulse), .key_inc_pulse(key_inc_pulse), .key_alarm_off_pulse(key_alarm_off_pulse),
-        .hour_in(hour_from_counter), .min_in(min_from_counter), .sec_in(sec_from_counter),
-        .time_count_en(time_count_en_wire), .load_en(load_en_wire),
-        .hour_out(hour_to_counter), .min_out(min_to_counter),
-        .alarm_on_flag(alarm_on_flag_wire),
-        .display_mode(display_mode_wire)
-    );
-    
-    // 实例化蜂鸣器控制器 (假设存在)
-    buzzer_controller u_buzzer (.clk(clk), .rst(rst), .alarm_on(alarm_on_flag_wire), .beep(beep));
-
-    // 实例化时钟分频器（现在是使能信号生成器）
-    clk_divider u_clk_divider (
-        .clk_in(clk), 
-        .rst(rst), 
-        .clk_1hz_en(clk_1hz_en_wire) // 【改动】连接到新的输出端口
-    );
-
-    // 实例化时间计数器
-    time_counter u_time_counter (
-        .clk(clk),                   // 【改动】连接主时钟
-        .clk_1hz_en(clk_1hz_en_wire),// 【改动】连接1Hz使能信号
-        .rst(rst),
-        .time_count_en(time_count_en_wire), .load_en(load_en_wire),
-        .hour_in(hour_to_counter), .min_in(min_to_counter),
-        .hour(hour_from_counter), .min(min_from_counter), .sec(sec_from_counter)
+        .h_units_in(h_units), .h_tens_in(h_tens),
+        .m_units_in(m_units), .m_tens_in(m_tens),
+        .s_units_in(s_units), .s_tens_in(s_tens),
+        // 【修正】将 u_time_set_reg 的输出连接到 u_controller 的新输入
+        .adj_h_units_in(adj_h_units), .adj_h_tens_in(adj_h_tens),
+        .adj_m_units_in(adj_m_units), .adj_m_tens_in(adj_m_tens),
+        .alarm_h_units_in(alarm_h_units), .alarm_h_tens_in(alarm_h_tens),
+        .alarm_m_units_in(alarm_m_units), .alarm_m_tens_in(alarm_m_tens),
+        .time_count_en(time_count_en), .time_load_en(time_load_en),
+        .hour_to_load(hour_to_load), .min_to_load(min_to_load),
+        .time_adj_load_en(time_adj_load_en), .time_adj_init_h(time_adj_init_h), .time_adj_init_m(time_adj_init_m),
+        .time_adj_h_sel(time_adj_h_sel), .time_adj_m_sel(time_adj_m_sel), .time_adj_inc_pulse(time_adj_inc_pulse),
+        .alarm_adj_load_en(alarm_adj_load_en), .alarm_adj_h_sel(alarm_adj_h_sel), .alarm_adj_m_sel(alarm_adj_m_sel), .alarm_adj_inc_pulse(alarm_adj_inc_pulse),
+        .alarm_on_flag(alarm_on_flag)
     );
 
-    // 实例化显示扫描模块
-    display_scanner u_display_scanner (
-        .clk(clk), .rst(rst),
-        .hour(hour_from_counter), .min(min_from_counter), .sec(sec_from_counter),
-        .display_mode(display_mode_wire),
-        .num_to_decode(num_to_decode_wire),
-        .digit_sel(digit_sel)
-    );
-
-    // 实例化显示译码模块
-    display_decoder u_display_decoder (.num_in(num_to_decode_wire), .seg_out(seg_out));
+    display_controller u_display_controller ( .h_units_in(h_units), .h_tens_in(h_tens), .m_units_in(m_units), .m_tens_in(m_tens), .s_units_in(s_units), .s_tens_in(s_tens), .seg_hour0(seg_hour0), .seg_hour1(seg_hour1), .seg_min0(seg_min0), .seg_min1(seg_min1), .seg_sec0(seg_sec0), .seg_sec1(seg_sec1) );
+    buzzer_controller u_buzzer (.clk_buzzer_osc(clk_buzzer_osc), .rst(rst_signal), .alarm_on(alarm_on_flag), .beep(beep));
 
 endmodule

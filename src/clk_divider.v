@@ -1,32 +1,79 @@
-// src/clk_divider.v
-// --- FINAL VERSION (Corrected) ---
-// 功能：不再生成一个独立时钟，而是生成一个1Hz的单周期脉冲使能信号
+// src/clk_divider.v (Re-architected Version)
+// 功能：从50MHz主时钟分频出多个用于不同子模块的真实时钟信号
 
 module clk_divider (
-    input   wire    clk_in,
-    input   wire    rst,
-    output  reg     clk_1hz_en // 输出端口从 clk_1hz 重命名为 clk_1hz_en
+    input wire clk,       // 50MHz 主时钟
+    input wire rst,       // 高电平有效复位
+    output wire clk_1hz,       // 1Hz 时钟，用于驱动时间计数
+    output wire clk_100hz,     // 100Hz 时钟，用于驱动按键消抖和状态机
+    output wire clk_buzzer_osc // 1kHz 时钟，作为蜂鸣器振荡源
 );
-    // 使用参数方便在仿真和硬件之间切换
-    parameter SIMULATION = 1; // 仿真设为1, 硬件设为0
 
-    // 根据模式定义计数器最大值
-    localparam CNT_MAX = (SIMULATION == 1) ? 50 : 50_000_000;
+    parameter CLK_FREQ = 50_000_000;
 
-    reg [$clog2(CNT_MAX)-1:0] counter;
+    // --- FOR SYNTHESIS (ON-BOARD) ---
+    localparam TARGET_1HZ_FREQ    = 1;
+    localparam TARGET_100HZ_FREQ  = 100;
+    localparam TARGET_BUZZER_FREQ = 1000;
 
-    always @(posedge clk_in or posedge rst) begin
+    // 计算计数器最大值: (输入频率 / 目标频率 / 2) - 1, 产生50%占空比时钟
+    localparam DIV_1HZ_MAX      = CLK_FREQ / TARGET_1HZ_FREQ / 2 - 1;
+    localparam DIV_100HZ_MAX    = CLK_FREQ / TARGET_100HZ_FREQ / 2 - 1; 
+    localparam DIV_BUZZER_MAX   = CLK_FREQ / TARGET_BUZZER_FREQ / 2 - 1; 
+
+    reg [$clog2(DIV_1HZ_MAX)-1:0]   count_1hz;
+    reg [$clog2(DIV_100HZ_MAX)-1:0] count_100hz;
+    reg [$clog2(DIV_BUZZER_MAX)-1:0] count_buzzer;
+
+    reg clk_1hz_r, clk_100hz_r, clk_buzzer_osc_r;
+    
+    // 1Hz Clock Generation
+    always @(posedge clk) begin
         if (rst) begin
-            counter <= 0;
-            clk_1hz_en <= 1'b0;
+            count_1hz <= 0;
+            clk_1hz_r <= 1'b0;
         end else begin
-            if (counter == CNT_MAX - 1) begin
-                counter <= 0;
-                clk_1hz_en <= 1'b1; // 在计数达到最大值时，产生一个单周期的使能脉冲
+            if (count_1hz == DIV_1HZ_MAX) begin
+                count_1hz <= 0;
+                clk_1hz_r <= ~clk_1hz_r;
             end else begin
-                counter <= counter + 1;
-                clk_1hz_en <= 1'b0; // 在其他时间，使能信号保持为低
+                count_1hz <= count_1hz + 1;
             end
         end
     end
+    
+    // 100Hz Clock Generation
+    always @(posedge clk) begin
+        if (rst) begin
+            count_100hz <= 0;
+            clk_100hz_r <= 1'b0;
+        end else begin
+            if (count_100hz == DIV_100HZ_MAX) begin
+                count_100hz <= 0;
+                clk_100hz_r <= ~clk_100hz_r;
+            end else begin
+                count_100hz <= count_100hz + 1;
+            end
+        end
+    end
+
+    // Buzzer Clock Generation (1kHz)
+    always @(posedge clk) begin
+        if (rst) begin
+            count_buzzer <= 0;
+            clk_buzzer_osc_r <= 1'b0;
+        end else begin
+            if (count_buzzer == DIV_BUZZER_MAX) begin
+                count_buzzer <= 0;
+                clk_buzzer_osc_r <= ~clk_buzzer_osc_r;
+            end else begin
+                count_buzzer <= count_buzzer + 1;
+            end
+        end
+    end
+    
+    assign clk_1hz        = clk_1hz_r;
+    assign clk_100hz      = clk_100hz_r;
+    assign clk_buzzer_osc = clk_buzzer_osc_r;
+
 endmodule
