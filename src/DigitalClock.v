@@ -77,23 +77,24 @@ module DigitalClock (
         
     // -- Correct Display Mux Logic --
     // This block selects which BCD values to show based on the controller's state.
+    // (这部分逻辑保持不变)
     reg [3:0] disp_h_tens_mux, disp_h_units_mux, disp_m_tens_mux, disp_m_units_mux;
 
     always @(*) begin
         case (controller_state)
-            S_ADJ_H, S_ADJ_M: begin // In time adjust mode, show the adjusted value
+            S_ADJ_H, S_ADJ_M: begin
                 disp_h_tens_mux = adj_h_tens;
                 disp_h_units_mux = adj_h_units;
                 disp_m_tens_mux = adj_m_tens;
                 disp_m_units_mux = adj_m_units;
             end
-            S_ALARM_H, S_ALARM_M: begin // In alarm adjust mode, show the alarm value
+            S_ALARM_H, S_ALARM_M: begin
                 disp_h_tens_mux = alarm_h_tens;
                 disp_h_units_mux = alarm_h_units;
                 disp_m_tens_mux = alarm_m_tens;
                 disp_m_units_mux = alarm_m_units;
             end
-            default: begin // In normal mode, show the current time
+            default: begin
                 disp_h_tens_mux = h_tens;
                 disp_h_units_mux = h_units;
                 disp_m_tens_mux = m_tens;
@@ -102,18 +103,25 @@ module DigitalClock (
         endcase
     end
 
-    // -- New Blinking Logic: Blink HH:MM during any adjustment --
-    wire is_blinking = display_is_adjusting && clk_2hz;
+    // -- NEW Selective Blinking Logic --
+    // Determine if the hour or minute part should be blinking based on the current state.
+    wire hour_is_blinking = (controller_state == S_ADJ_H || controller_state == S_ALARM_H);
+    wire min_is_blinking  = (controller_state == S_ADJ_M || controller_state == S_ALARM_M);
 
-    assign seg_hour1 = is_blinking ? BLANK : disp_h_tens_mux;
-    assign seg_hour0 = is_blinking ? BLANK : disp_h_units_mux;
-    assign seg_min1  = is_blinking ? BLANK : disp_m_tens_mux;
-    assign seg_min0  = is_blinking ? BLANK : disp_m_units_mux;
+    // Combine with the 2Hz clock to create the final blinking effect.
+    wire hour_blink_effect = hour_is_blinking && clk_2hz;
+    wire min_blink_effect  = min_is_blinking  && clk_2hz;
+
+    // Apply the blinking effect to the final segment outputs.
+    assign seg_hour1 = hour_blink_effect ? BLANK : disp_h_tens_mux;
+    assign seg_hour0 = hour_blink_effect ? BLANK : disp_h_units_mux;
+    assign seg_min1  = min_blink_effect  ? BLANK : disp_m_tens_mux;
+    assign seg_min0  = min_blink_effect  ? BLANK : disp_m_units_mux;
     assign seg_sec1  = s_tens; // Seconds never blink
     assign seg_sec0  = s_units;
 
     // -- Final Module Instantiations --
-    // u_display_controller removed as it's redundant.
+    // u_display_controller is correctly removed.
     buzzer_controller u_buzzer (.clk_buzzer_osc(clk_buzzer_osc), .rst(rst_signal), .alarm_on(alarm_on_flag), .beep(beep));
 
 endmodule
