@@ -1,4 +1,4 @@
-// src/clock_controller.v (Final Version with display control output)
+// src/clock_controller.v (Corrected and Upgraded Version)
 module clock_controller (
     input   wire        clk_100hz,
     input   wire        rst,
@@ -35,19 +35,22 @@ module clock_controller (
     
     output              alarm_on_flag,
     
-    output  wire        display_is_adjusting // New output for display control
+    output  wire        display_is_adjusting,
+    output  wire [2:0]  current_state // New output
 );
 
     parameter S_NORMAL=3'd0, S_ADJ_H=3'd1, S_ADJ_M=3'd2, S_ALARM_H=3'd3, S_ALARM_M=3'd4;
-    reg [2:0] current_state, next_state;
+    reg [2:0] state_r, next_state;
+
+    assign current_state = state_r;
 
     always @(posedge clk_100hz) begin
-        if (rst) current_state <= S_NORMAL;
-        else     current_state <= next_state;
+        if (rst) state_r <= S_NORMAL;
+        else     state_r <= next_state;
     end
 
     always @(*) begin
-        case (current_state)
+        case (state_r)
             S_NORMAL:  next_state = key_mode_pulse ? S_ADJ_H     : S_NORMAL;
             S_ADJ_H:   next_state = key_mode_pulse ? S_ADJ_M     : S_ADJ_H;
             S_ADJ_M:   next_state = key_mode_pulse ? S_ALARM_H   : S_ADJ_M;
@@ -58,6 +61,7 @@ module clock_controller (
     end
 
     reg is_alarming;
+    reg load_alarm_after_rst;
     wire [5:0] current_sec_bin = s_tens_in * 10 + s_units_in;
 
     always @(posedge clk_100hz) begin
@@ -65,20 +69,28 @@ module clock_controller (
             time_count_en <= 1'b1; time_load_en <= 1'b0; hour_to_load <= 'd0; min_to_load <= 'd0;
             time_adj_load_en <= 1'b0; time_adj_init_h <= 'd0; time_adj_init_m <= 'd0;
             time_adj_h_sel <= 1'b0; time_adj_m_sel <= 1'b0; time_adj_inc_pulse <= 1'b0;
-            alarm_adj_load_en <= 1'b1; alarm_adj_h_sel <= 1'b0; alarm_adj_m_sel <= 1'b0; alarm_adj_inc_pulse <= 1'b0;
+            alarm_adj_load_en <= 1'b0; alarm_adj_h_sel <= 1'b0; alarm_adj_m_sel <= 1'b0; alarm_adj_inc_pulse <= 1'b0;
             is_alarming <= 1'b0;
+            load_alarm_after_rst <= 1'b1; // Set flag to load alarm value after reset
         end else begin
+            // Default assignments to prevent latches
             time_load_en <= 1'b0;
             time_adj_load_en <= 1'b0; time_adj_h_sel <= 1'b0; time_adj_m_sel <= 1'b0; time_adj_inc_pulse <= 1'b0;
-            alarm_adj_h_sel <= 1'b0; alarm_adj_m_sel <= 1'b0; alarm_adj_inc_pulse <= 1'b0;
+            alarm_adj_load_en <= 1'b0; alarm_adj_h_sel <= 1'b0; alarm_adj_m_sel <= 1'b0; alarm_adj_inc_pulse <= 1'b0;
 
-            case (current_state)
+            // One-shot load for alarm register after reset
+            if (load_alarm_after_rst) begin
+                alarm_adj_load_en <= 1'b1;
+                load_alarm_after_rst <= 1'b0;
+            end
+
+            case (state_r)
                 S_NORMAL: begin
                     time_count_en <= 1'b1;
                 end
                 S_ADJ_H: begin
                     time_count_en <= 1'b0;
-                    if (next_state != current_state) begin
+                    if (next_state != state_r) begin // Entering S_ADJ_H for the first time
                         time_adj_load_en <= 1'b1;
                         time_adj_init_h <= h_tens_in * 10 + h_units_in;
                         time_adj_init_m <= m_tens_in * 10 + m_units_in;
@@ -90,7 +102,7 @@ module clock_controller (
                     time_count_en <= 1'b0;
                     time_adj_m_sel <= 1'b1;
                     time_adj_inc_pulse <= key_inc_pulse;
-                     if (next_state != current_state) begin
+                     if (next_state != state_r) begin // Entering S_ALARM_H, so load adjusted time
                         time_load_en <= 1'b1;
                         hour_to_load <= adj_h_tens_in * 10 + adj_h_units_in;
                         min_to_load  <= adj_m_tens_in * 10 + adj_m_units_in;
@@ -108,9 +120,10 @@ module clock_controller (
                 end
             endcase
 
-            if (key_alarm_off_pulse || (current_state != S_NORMAL && key_mode_pulse)) begin
+            // Alarm logic
+            if (key_alarm_off_pulse || (state_r != S_NORMAL && key_mode_pulse)) begin
                 is_alarming <= 1'b0;
-            end else if (!is_alarming && current_state == S_NORMAL &&
+            end else if (!is_alarming && state_r == S_NORMAL &&
                          h_tens_in == alarm_h_tens_in && h_units_in == alarm_h_units_in &&
                          m_tens_in == alarm_m_tens_in && m_units_in == alarm_m_units_in &&
                          current_sec_bin == 0) begin
@@ -120,6 +133,6 @@ module clock_controller (
     end
     
     assign alarm_on_flag = is_alarming;
-    assign display_is_adjusting = (current_state != S_NORMAL);
+    assign display_is_adjusting = (state_r != S_NORMAL);
     
 endmodule

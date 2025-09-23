@@ -1,7 +1,7 @@
-// src/DigitalClock.v (Final Version with all fixes)
+// src/DigitalClock.v (Fully Corrected and Upgraded Version)
 module DigitalClock (
-    input  wire        clk,
-    input  wire        rst_key_in, // 外部复位按键
+    input  wire        clk,           // 50MHz Main Clock
+    input  wire        rst_key_in,    // External reset key
     input  wire        key_mode,
     input  wire        key_inc,
     input  wire        key_alarm_off,
@@ -10,16 +10,28 @@ module DigitalClock (
     output wire [3:0]  seg_min0, seg_min1,
     output wire [3:0]  seg_hour0, seg_hour1
 );
-    // -- Internal Wires --
+    // -- Internal Wires and Parameters --
+    localparam S_NORMAL=3'd0, S_ADJ_H=3'd1, S_ADJ_M=3'd2, S_ALARM_H=3'd3, S_ALARM_M=3'd4;
+    localparam BLANK = 4'hF; // BCD code to make the 7-seg display blank
+
     wire clk_1hz, clk_2hz, clk_100hz, clk_buzzer_osc;
     wire key_mode_pulse, key_inc_pulse, key_alarm_off_pulse;
+    wire rst_signal;
+
+    // -- Reset Logic: Combining Power-On Reset and Synchronized Manual Reset --
+    wire por_rst;
+    power_on_reset u_por (.clk(clk), .rst(por_rst));
+
+    // Synchronize the external manual reset key to prevent metastability
+    reg rst_key_sync_0, rst_key_sync_1;
+    always @(posedge clk) begin
+        // ** IMPORTANT **: Modify based on your board. This assumes active-low key (press = 0).
+        rst_key_sync_0 <= rst_key_in; 
+        rst_key_sync_1 <= rst_key_sync_0;
+    end
     
-    // -- Reset Logic --
-    // ** 重要 **: 根据你的开发板修改这里.
-    // 如果你的复位按键按下时是高电平 (1), 使用下面这行.
-    wire rst_signal = rst_key_in; 
-    // 如果你的复位按键按下时是低电平 (0), 使用下面这行.
-    // wire rst_signal = ~rst_key_in;
+    // Final reset signal is high if power-on reset is active OR manual reset is pressed
+    assign rst_signal = por_rst || rst_key_sync_1;
 
     // -- Module Instantiations --
 
@@ -48,6 +60,7 @@ module DigitalClock (
     bcd_adjustable_time_reg u_alarm_set_reg ( .clk_100hz(clk_100hz), .rst(rst_signal), .load_en(alarm_adj_load_en), .init_h_val(5'd6), .init_m_val(6'd0), .h_sel(alarm_adj_h_sel), .m_sel(alarm_adj_m_sel), .inc_val_pulse(alarm_adj_inc_pulse), .h_units_r(alarm_h_units), .h_tens_r(alarm_h_tens), .m_units_r(alarm_m_units), .m_tens_r(alarm_m_tens) );
 
     wire alarm_on_flag, display_is_adjusting;
+    wire [2:0] controller_state;
     clock_controller u_controller (
         .clk_100hz(clk_100hz), .rst(rst_signal),
         .key_mode_pulse(key_mode_pulse), .key_inc_pulse(key_inc_pulse), .key_alarm_off_pulse(key_alarm_off_pulse),
@@ -58,42 +71,49 @@ module DigitalClock (
         .time_adj_load_en(time_adj_load_en), .time_adj_init_h(time_adj_init_h), .time_adj_init_m(time_adj_init_m),
         .time_adj_h_sel(time_adj_h_sel), .time_adj_m_sel(time_adj_m_sel), .time_adj_inc_pulse(time_adj_inc_pulse),
         .alarm_adj_load_en(alarm_adj_load_en), .alarm_adj_h_sel(alarm_adj_h_sel), .alarm_adj_m_sel(alarm_adj_m_sel), .alarm_adj_inc_pulse(alarm_adj_inc_pulse),
-        .alarm_on_flag(alarm_on_flag), .display_is_adjusting(display_is_adjusting)
+        .alarm_on_flag(alarm_on_flag), .display_is_adjusting(display_is_adjusting),
+        .current_state(controller_state)
     );
+        
+    // -- Correct Display Mux Logic --
+    // This block selects which BCD values to show based on the controller's state.
+    reg [3:0] disp_h_tens_mux, disp_h_units_mux, disp_m_tens_mux, disp_m_units_mux;
 
-    // -- Display Mux and Blinking Logic --
-    localparam BLANK = 4'hF; // BCD code to make the 7-seg display blank
-    wire [3:0] disp_h_units_mux, disp_h_tens_mux, disp_m_units_mux, disp_m_tens_mux;
+    always @(*) begin
+        case (controller_state)
+            S_ADJ_H, S_ADJ_M: begin // In time adjust mode, show the adjusted value
+                disp_h_tens_mux = adj_h_tens;
+                disp_h_units_mux = adj_h_units;
+                disp_m_tens_mux = adj_m_tens;
+                disp_m_units_mux = adj_m_units;
+            end
+            S_ALARM_H, S_ALARM_M: begin // In alarm adjust mode, show the alarm value
+                disp_h_tens_mux = alarm_h_tens;
+                disp_h_units_mux = alarm_h_units;
+                disp_m_tens_mux = alarm_m_tens;
+                disp_m_units_mux = alarm_m_units;
+            end
+            default: begin // In normal mode, show the current time
+                disp_h_tens_mux = h_tens;
+                disp_h_units_mux = h_units;
+                disp_m_tens_mux = m_tens;
+                disp_m_units_mux = m_units;
+            end
+        endcase
+    end
 
-    assign disp_h_tens_mux = (display_is_adjusting) ? 
-                             (time_adj_h_sel ? adj_h_tens : alarm_h_tens) : 
-                             h_tens;
-    assign disp_h_units_mux = (display_is_adjusting) ? 
-                              (time_adj_h_sel ? adj_h_units : alarm_h_units) :
-                              h_units;
-    assign disp_m_tens_mux = (display_is_adjusting) ? 
-                             (time_adj_m_sel ? adj_m_tens : alarm_m_tens) :
-                             m_tens;
-    assign disp_m_units_mux = (display_is_adjusting) ? 
-                              (time_adj_m_sel ? adj_m_units : alarm_m_units) :
-                              m_units;
+    // -- New Blinking Logic: Blink HH:MM during any adjustment --
+    wire is_blinking = display_is_adjusting && clk_2hz;
 
-    // Final output to display controller with blinking
-    assign seg_hour1 = ((time_adj_h_sel || alarm_adj_h_sel) && clk_2hz) ? BLANK : disp_h_tens_mux;
-    assign seg_hour0 = ((time_adj_h_sel || alarm_adj_h_sel) && clk_2hz) ? BLANK : disp_h_units_mux;
-    assign seg_min1  = ((time_adj_m_sel || alarm_adj_m_sel) && clk_2hz) ? BLANK : disp_m_tens_mux;
-    assign seg_min0  = ((time_adj_m_sel || alarm_adj_m_sel) && clk_2hz) ? BLANK : disp_m_units_mux;
-    assign seg_sec1  = s_tens; // Seconds do not blink
+    assign seg_hour1 = is_blinking ? BLANK : disp_h_tens_mux;
+    assign seg_hour0 = is_blinking ? BLANK : disp_h_units_mux;
+    assign seg_min1  = is_blinking ? BLANK : disp_m_tens_mux;
+    assign seg_min0  = is_blinking ? BLANK : disp_m_units_mux;
+    assign seg_sec1  = s_tens; // Seconds never blink
     assign seg_sec0  = s_units;
 
-    // Final module instantiations
-    display_controller u_display_controller (
-        .h_units_in(seg_hour0), .h_tens_in(seg_hour1), // Connect to the final muxed/blinked signals
-        .m_units_in(seg_min0), .m_tens_in(seg_min1),
-        .s_units_in(seg_sec0), .s_tens_in(seg_sec1)
-        // The display controller itself doesn't need to know its outputs are named seg_*
-        // This is a stylistic choice for clarity; the wiring is what matters.
-    );
+    // -- Final Module Instantiations --
+    // u_display_controller removed as it's redundant.
     buzzer_controller u_buzzer (.clk_buzzer_osc(clk_buzzer_osc), .rst(rst_signal), .alarm_on(alarm_on_flag), .beep(beep));
 
 endmodule
