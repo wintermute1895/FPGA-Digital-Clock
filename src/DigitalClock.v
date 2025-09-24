@@ -1,4 +1,4 @@
-// src/DigitalClock.v (Fully Corrected and Upgraded Version)
+// src/DigitalClock.v (Corrected Version 2: Active-High Key Logic)
 module DigitalClock (
     input  wire        clk,           // 50MHz Main Clock
     input  wire        rst_key_in,    // External reset key
@@ -22,19 +22,15 @@ module DigitalClock (
     wire por_rst;
     power_on_reset u_por (.clk(clk), .rst(por_rst));
 
-    // Synchronize the external manual reset key to prevent metastability
     reg rst_key_sync_0, rst_key_sync_1;
     always @(posedge clk) begin
-        // ** IMPORTANT **: Modify based on your board. This assumes active-low key (press = 0).
         rst_key_sync_0 <= rst_key_in; 
         rst_key_sync_1 <= rst_key_sync_0;
     end
     
-    // Final reset signal is high if power-on reset is active OR manual reset is pressed
     assign rst_signal = por_rst || rst_key_sync_1;
 
     // -- Module Instantiations --
-
     clk_divider u_clk_divider (
         .clk(clk), .rst(rst_signal),
         .clk_1hz(clk_1hz), .clk_2hz(clk_2hz), .clk_100hz(clk_100hz), .clk_buzzer_osc(clk_buzzer_osc)
@@ -75,53 +71,84 @@ module DigitalClock (
         .current_state(controller_state)
     );
         
-    // -- Correct Display Mux Logic --
-    // This block selects which BCD values to show based on the controller's state.
-    // (这部分逻辑保持不变)
+    // -- NEW LOGIC START: Long-press detection for displaying alarm time --
+    localparam LONG_PRESS_THRESHOLD = 50; // 50 cycles @ 100Hz = 0.5 seconds
+
+    reg [5:0] alarm_off_key_cnt;
+    reg       show_alarm_on_display_flag;
+    
+    always @(posedge clk_100hz) begin
+        if (rst_signal) begin
+            alarm_off_key_cnt <= 0;
+            show_alarm_on_display_flag <= 1'b0;
+        // The feature is only active in normal display mode
+        end else if (controller_state != S_NORMAL) begin
+            alarm_off_key_cnt <= 0;
+            show_alarm_on_display_flag <= 1'b0;
+        // CORRECTED: Now checks for active-high key press (1 when pressed)
+        end else if (key_alarm_off == 1'b1) begin 
+            if (alarm_off_key_cnt < LONG_PRESS_THRESHOLD) begin
+                alarm_off_key_cnt <= alarm_off_key_cnt + 1;
+            end else begin
+                // Long press detected, set the flag
+                show_alarm_on_display_flag <= 1'b1;
+            end
+        // Key is released (is 0), reset everything
+        end else begin
+            alarm_off_key_cnt <= 0;
+            show_alarm_on_display_flag <= 1'b0;
+        end
+    end
+    // -- NEW LOGIC END --
+
+    // -- MODIFIED Display Mux Logic --
     reg [3:0] disp_h_tens_mux, disp_h_units_mux, disp_m_tens_mux, disp_m_units_mux;
 
     always @(*) begin
-        case (controller_state)
-            S_ADJ_H, S_ADJ_M: begin
-                disp_h_tens_mux = adj_h_tens;
-                disp_h_units_mux = adj_h_units;
-                disp_m_tens_mux = adj_m_tens;
-                disp_m_units_mux = adj_m_units;
-            end
-            S_ALARM_H, S_ALARM_M: begin
-                disp_h_tens_mux = alarm_h_tens;
-                disp_h_units_mux = alarm_h_units;
-                disp_m_tens_mux = alarm_m_tens;
-                disp_m_units_mux = alarm_m_units;
-            end
-            default: begin
-                disp_h_tens_mux = h_tens;
-                disp_h_units_mux = h_units;
-                disp_m_tens_mux = m_tens;
-                disp_m_units_mux = m_units;
-            end
-        endcase
+        if (show_alarm_on_display_flag) begin
+            disp_h_tens_mux = alarm_h_tens;
+            disp_h_units_mux = alarm_h_units;
+            disp_m_tens_mux = alarm_m_tens;
+            disp_m_units_mux = alarm_m_units;
+        end else begin
+            case (controller_state)
+                S_ADJ_H, S_ADJ_M: begin
+                    disp_h_tens_mux = adj_h_tens;
+                    disp_h_units_mux = adj_h_units;
+                    disp_m_tens_mux = adj_m_tens;
+                    disp_m_units_mux = adj_m_units;
+                end
+                S_ALARM_H, S_ALARM_M: begin
+                    disp_h_tens_mux = alarm_h_tens;
+                    disp_h_units_mux = alarm_h_units;
+                    disp_m_tens_mux = alarm_m_tens;
+                    disp_m_units_mux = alarm_m_units;
+                end
+                default: begin // S_NORMAL
+                    disp_h_tens_mux = h_tens;
+                    disp_h_units_mux = h_units;
+                    disp_m_tens_mux = m_tens;
+                    disp_m_units_mux = m_units;
+                end
+            endcase
+        end
     end
 
-    // -- NEW Selective Blinking Logic --
-    // Determine if the hour or minute part should be blinking based on the current state.
+    // -- Selective Blinking Logic (No changes here) --
     wire hour_is_blinking = (controller_state == S_ADJ_H || controller_state == S_ALARM_H);
     wire min_is_blinking  = (controller_state == S_ADJ_M || controller_state == S_ALARM_M);
 
-    // Combine with the 2Hz clock to create the final blinking effect.
     wire hour_blink_effect = hour_is_blinking && clk_2hz;
     wire min_blink_effect  = min_is_blinking  && clk_2hz;
 
-    // Apply the blinking effect to the final segment outputs.
     assign seg_hour1 = hour_blink_effect ? BLANK : disp_h_tens_mux;
     assign seg_hour0 = hour_blink_effect ? BLANK : disp_h_units_mux;
     assign seg_min1  = min_blink_effect  ? BLANK : disp_m_tens_mux;
     assign seg_min0  = min_blink_effect  ? BLANK : disp_m_units_mux;
-    assign seg_sec1  = s_tens; // Seconds never blink
+    assign seg_sec1  = s_tens;
     assign seg_sec0  = s_units;
 
     // -- Final Module Instantiations --
-    // u_display_controller is correctly removed.
     buzzer_controller u_buzzer (.clk_buzzer_osc(clk_buzzer_osc), .rst(rst_signal), .alarm_on(alarm_on_flag), .beep(beep));
 
 endmodule
